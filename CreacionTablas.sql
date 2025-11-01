@@ -80,7 +80,7 @@ CREATE TABLE ProductoPresentacion (
     prp_id INT AUTO_INCREMENT PRIMARY KEY,
     pro_id INT NOT NULL,
     tam_id INT NOT NULL,
-    prp_precio DECIMAL(10,2) NOT NULL,
+    prp_precio INT NOT NULL,
     FOREIGN KEY (pro_id) REFERENCES Producto(pro_id),
     FOREIGN KEY (tam_id) REFERENCES Tamano(tam_id)
 );

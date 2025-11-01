@@ -53,8 +53,9 @@ INSERT INTO Ingrediente (ing_nom, ing_um, ing_stock, ing_reord) VALUES
 ('Glaseado de vainilla', 'kg', 4.00, 1.00),          
 ('Queso mascarpone', 'kg', 5.00, 1.00),              
 ('Galletas tipo soletilla', 'kg', 6.00, 1.00),       
-('Frambuesas', 'kg', 3.00, 1.00);                    
-
+('Frambuesas', 'kg', 3.00, 1.00),
+('Coco rallado', 'kg', 1.00, 3.00),
+('Jarabe de chocolate', 'L', 0.50, 2.00);
 
 INSERT INTO Receta (rec_nom) VALUES
 ('Torta de chocolate'),

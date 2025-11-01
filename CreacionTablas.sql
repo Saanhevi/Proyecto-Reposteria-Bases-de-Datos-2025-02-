@@ -91,7 +91,7 @@ CREATE TABLE Pedido (
     emp_id INT NOT NULL,
     ped_fec DATE NOT NULL,
     ped_hora TIME NOT NULL,
-    ped_est ENUM('Pendiente','Entregado','Anulado') NOT NULL,
+    ped_est ENUM('Pendiente', 'Preparado','Entregado','Anulado') NOT NULL,
     ped_total INT NOT NULL,
     FOREIGN KEY (cli_cedula) REFERENCES Cliente(cli_cedula),
     FOREIGN KEY (emp_id) REFERENCES Cajero(emp_id)

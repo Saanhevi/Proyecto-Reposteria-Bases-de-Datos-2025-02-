@@ -165,7 +165,7 @@ JOIN Cliente USING(cli_cedula)
 WHERE ped_est = 'Pendiente'
 ORDER BY ped_fec;
 
-SELECT * FROM vw_cajero_pedidos_pendientes_entrega;
+SELECT * FROM vw_cajero_pedidos_pendientes;
 
 -- 4. Pedidos pendientes de cobro
 CREATE VIEW vw_cajero_pedidos_pendientes_cobro AS

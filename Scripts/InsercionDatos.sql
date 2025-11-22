@@ -10,23 +10,23 @@ INSERT INTO Cliente (cli_cedula, cli_nom, cli_apellido, cli_tel, cli_dir) VALUES
 (1076790905, 'Daniela', 'Ortiz', '3184449999', 'Transv. 8 #56-21'),
 (1078065423, 'Felipe', 'Cano', '3195550000', 'Diagonal 12 #78-23');
 
-INSERT INTO Empleado (emp_nom, emp_tel) VALUES
-('Ana Ruiz', '3154441111'),
-('Julián Castro', '3164442222'),
-('Diana Cárdenas', '3174443333'),
-('Luis Vargas', '3184444444'),
-('Camila Torres', '3194445555');
+INSERT INTO Empleado (emp_id,emp_nom, emp_tel) VALUES
+(1016797813,'Ana Ruiz', '3154441111'),
+(1066280984,'Julián Castro', '3164442222'),
+(1016797832,'Diana Cárdenas', '3174443333'),
+(1016797213,'Luis Vargas', '3184444444'),
+(1016797223,'Camila Torres', '3194445555');
 
 INSERT INTO Cajero (emp_id, caj_turno) VALUES
-(1, 'Mañana'),
-(2, 'Tarde');
+(1016797813, 'Mañana'),
+(1066280984, 'Tarde');
 
 INSERT INTO Repostero (emp_id, rep_especialidad) VALUES
-(3, 'Tortas frías'),
-(4, 'Postres al horno');
+(1016797832, 'Tortas frías'),
+(1016797213, 'Postres al horno');
 
 INSERT INTO Domiciliario (emp_id, dom_medTrans) VALUES
-(5, 'Moto');
+(1016797223, 'Moto');
 
 INSERT INTO Proveedor (prov_nom, prov_tel, prov_dir) VALUES
 ('Provepan', '3005551010', 'Cra 12 #45-56'),
@@ -53,9 +53,8 @@ INSERT INTO Ingrediente (ing_nom, ing_um, ing_stock, ing_reord) VALUES
 ('Glaseado de vainilla', 'kg', 4.00, 1.00),          
 ('Queso mascarpone', 'kg', 5.00, 1.00),              
 ('Galletas tipo soletilla', 'kg', 6.00, 1.00),       
-('Frambuesas', 'kg', 3.00, 1.00),
-('Coco rallado', 'kg', 1.00, 3.00),
-('Jarabe de chocolate', 'L', 0.50, 2.00);
+('Frambuesas', 'kg', 3.00, 1.00);                    
+
 
 INSERT INTO Receta (rec_nom) VALUES
 ('Torta de chocolate'),
@@ -138,19 +137,19 @@ INSERT INTO ProductoPresentacion (pro_id, tam_id, prp_precio) VALUES
 (7, 4, 24000);
 
 INSERT INTO Pedido (cli_cedula, emp_id, ped_fec, ped_hora, ped_est, ped_total) VALUES
-(1016797812, 1, '2025-10-20', '09:30:00', 'Entregado', 25000),
-(1036897912, 2, '2025-10-21', '10:00:00', 'Pendiente', 32000),
-(1021243132, 1, '2025-10-22', '15:15:00', 'Entregado', 45000),
-(1023126339, 2, '2025-10-25', '11:45:00', 'Pendiente', 18000),
-(1055116539, 1, '2025-10-26', '14:20:00', 'Anulado', 80000),
-(1051351367, 1, '2025-10-27', '09:10:00', 'Entregado', 30000),
-(1077808445, 1, '2025-10-27', '09:45:00', 'Entregado', 18000),
-(1078904346, 2, '2025-10-28', '10:30:00', 'Pendiente', 21000),
-(1076790905, 1, '2025-10-28', '11:15:00', 'Entregado', 27000),
-(1078065423, 2, '2025-10-29', '16:00:00', 'Pendiente', 35000),
-(1016797812, 1, '2025-10-29', '17:30:00', 'Entregado', 18000),
-(1036897912, 1, '2025-10-30', '09:00:00', 'Entregado', 27000),
-(1078065423, 1, '2025-10-30', '17:00:00', 'Pendiente', 25000);
+(1016797812, 1016797813, '2025-10-20', '09:30:00', 'Entregado', 25000),
+(1036897912, 1066280984, '2025-10-21', '10:00:00', 'Pendiente', 32000),
+(1021243132, 1016797813, '2025-10-22', '15:15:00', 'Entregado', 45000),
+(1023126339, 1066280984, '2025-10-25', '11:45:00', 'Pendiente', 18000),
+(1055116539, 1016797813, '2025-10-26', '14:20:00', 'Anulado', 0),
+(1051351367, 1016797813, '2025-10-27', '09:10:00', 'Entregado', 30000),
+(1077808445, 1016797813, '2025-10-27', '09:45:00', 'Entregado', 18000),
+(1078904346, 1066280984, '2025-10-28', '10:30:00', 'Pendiente', 21000),
+(1076790905, 1016797813, '2025-10-28', '11:15:00', 'Entregado', 27000),
+(1078065423, 1066280984, '2025-10-29', '16:00:00', 'Pendiente', 35000),
+(1016797812, 1016797813, '2025-10-29', '17:30:00', 'Entregado', 18000),
+(1036897912, 1016797813, '2025-10-30', '09:00:00', 'Entregado', 27000),
+(1078065423, 1016797813, '2025-10-30', '17:00:00', 'Pendiente', 25000);
 
 INSERT INTO DetallePedido (ped_id, prp_id, dpe_can, dpe_subtotal) VALUES
 (1, 1, 2, 10000),

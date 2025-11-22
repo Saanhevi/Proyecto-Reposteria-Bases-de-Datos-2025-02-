@@ -4,14 +4,18 @@
 
 CREATE VIEW vw_admin_pedidos_realizados AS
 SELECT 
+    p.ped_id,
+    c.cli_cedula,
     c.cli_nom,
     c.cli_apellido,
+    e.emp_nom AS cajero_nom,
     p.ped_fec,
     p.ped_hora,
     p.ped_est,
     p.ped_total
 FROM Pedido p
-JOIN Cliente c USING (cli_cedula);
+JOIN Cliente c USING (cli_cedula)
+JOIN Empleado e USING (emp_id);
 
 SELECT * FROM vw_admin_pedidos_realizados;
 

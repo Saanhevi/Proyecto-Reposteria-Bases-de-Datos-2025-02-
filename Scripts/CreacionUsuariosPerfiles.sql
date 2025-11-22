@@ -3,13 +3,13 @@
 CREATE ROLE IF NOT EXISTS 'role_admin'@'localhost';
 
 -- Crear usuario admin (si no existe) 
-CREATE USER IF NOT EXISTS 'admin_user'@'localhost' IDENTIFIED BY '12345!';
+CREATE USER IF NOT EXISTS '123456'@'localhost' IDENTIFIED BY '12345!';
 
 -- Asignar rol al usuario
-GRANT 'role_admin'@'localhost' TO 'admin_user'@'localhost';
+GRANT 'role_admin'@'localhost' TO '123456'@'localhost';
 
 -- Definir el rol por defecto para el usuario
-SET DEFAULT ROLE 'role_admin'@'localhost' TO 'admin_user'@'localhost';
+SET DEFAULT ROLE 'role_admin'@'localhost' TO '123456'@'localhost';
 
 -- Asignar permisos a las tablas
 GRANT SELECT, INSERT, UPDATE, DELETE ON ReposteriaDB.Cliente TO 'role_admin'@'localhost';
@@ -47,13 +47,13 @@ GRANT SELECT ON ReposteriaDB.vw_admin_metodo_pago TO 'role_admin'@'localhost';
 CREATE ROLE IF NOT EXISTS 'role_cajero'@'localhost';
 
 -- Crear usuario cajero (si no existe)
-CREATE USER IF NOT EXISTS 'cajero_user'@'localhost' IDENTIFIED BY '12345!';
+CREATE USER IF NOT EXISTS '1016797813'@'localhost' IDENTIFIED BY '12345!';
 
 -- Asignar rol al usuario
-GRANT 'role_cajero'@'localhost' TO 'cajero_user'@'localhost';
+GRANT 'role_cajero'@'localhost' TO '1016797813'@'localhost';
 
 -- Definir el rol por defecto para el usuario
-SET DEFAULT ROLE 'role_cajero'@'localhost' TO 'cajero_user'@'localhost';
+SET DEFAULT ROLE 'role_cajero'@'localhost' TO '1016797813'@'localhost';
 
 -- Asignar permisos a las tablas
 GRANT SELECT, INSERT, UPDATE ON ReposteriaDB.Cliente TO 'role_cajero'@'localhost';
@@ -74,13 +74,13 @@ GRANT SELECT ON ReposteriaDB.vw_cajero_productos_disponibles TO 'role_cajero'@'l
 CREATE ROLE IF NOT EXISTS 'role_repostero'@'localhost';
 
 -- Crear usuario repostero (si no existe)
-CREATE USER IF NOT EXISTS 'repostero_user'@'localhost' IDENTIFIED BY '12345!';
+CREATE USER IF NOT EXISTS '1016797832'@'localhost' IDENTIFIED BY '12345!';
 
 -- Asignar rol al usuario
-GRANT 'role_repostero'@'localhost' TO 'repostero_user'@'localhost';
+GRANT 'role_repostero'@'localhost' TO '1016797832'@'localhost';
 
 -- Definir el rol por defecto para el usuario
-SET DEFAULT ROLE 'role_repostero'@'localhost' TO 'repostero_user'@'localhost';
+SET DEFAULT ROLE 'role_repostero'@'localhost' TO '1016797832'@'localhost';
 
 -- Asignar permisos a las tablas 
 GRANT SELECT ON ReposteriaDB.Ingrediente TO 'role_repostero'@'localhost';
@@ -99,4 +99,4 @@ GRANT SELECT ON ReposteriaDB.vw_repostero_ingredientes_necesarios TO 'role_repos
 GRANT SELECT ON ReposteriaDB.vw_repostero_pedidos_pendientes TO 'role_repostero'@'localhost';
 GRANT SELECT ON ReposteriaDB.vw_repostero_stock_ingredientes TO 'role_repostero'@'localhost';
 
-
+SELECT user, host FROM mysql.user;

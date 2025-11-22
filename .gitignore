@@ -1,0 +1,52 @@
+# Ignorar archivos de configuración de Homestead
+Homestead.json
+Homestead.yaml
+
+# Ignorar logs y archivos temporales globales
+*.log
+.DS_Store
+Thumbs.db
+
+# Ignorar variables de entorno
+.env
+.env.backup
+.env.production
+
+# IDEs
+/.fleet
+/.idea
+/.nova
+/.phpunit.cache
+/.vscode
+/.zed
+
+# PHP / Composer
+/vendor
+
+# Laravel storage
+/storage/*.key
+/storage/pail
+
+# Node.js
+/node_modules
+
+# Laravel public build files
+/public/build
+/public/hot
+/public/storage
+
+# ReposteriaApp ignorar paths internos
+ReposteriaApp/vendor
+ReposteriaApp/node_modules
+ReposteriaApp/storage/*.key
+ReposteriaApp/storage/pail
+ReposteriaApp/public/build
+ReposteriaApp/public/hot
+ReposteriaApp/public/storage
+
+# Config de PHP
+/auth.json
+
+# PHPUnit
+.phpunit.result.cache
+.phpactor.json

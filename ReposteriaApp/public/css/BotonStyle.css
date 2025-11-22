@@ -1,0 +1,107 @@
+/* BotonStyle.css */
+
+/* Styles for primary action buttons (e.g., "Nuevo Cliente", "Guardar") */
+.primary-action-button {
+    padding: 12px 25px;
+    font-size: 1.1rem;
+    background-color: #00CC99; /* Primary color from palette */
+    color: white;
+    border: 1px solid #00CC99;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0, 204, 153, 0.3); /* Subtle shadow */
+}
+
+.primary-action-button:hover {
+    background-color: #00b386; /* Slightly darker green */
+    border-color: #00b386;
+}
+
+/* Styles for table action buttons (e.g., "Editar", "Eliminar") */
+.action-button {
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 4px; /* Space between buttons */
+}
+
+.edit-button {
+    background-color: #3B82F6; /* Blue */
+    color: white;
+    border: 1px solid #3B82F6;
+}
+
+.edit-button:hover {
+    background-color: #2563EB; /* Darker blue */
+    border-color: #2563EB;
+}
+
+.delete-button {
+    background-color: #EF4444; /* Red */
+    color: white;
+    border: 1px solid #EF4444;
+}
+
+.delete-button:hover {
+    background-color: #DC2626; /* Darker red */
+    border-color: #DC2626;
+}
+
+/* Styles for cancel buttons */
+.cancel-button {
+    padding: 12px 25px;
+    font-size: 1.1rem;
+    background-color: #f3f4f6; /* Light gray */
+    color: #4B5563; /* Text color */
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+}
+
+.cancel-button:hover {
+    background-color: #e5e7eb; /* Slightly darker light gray */
+    border-color: #9ca3af;
+}
+
+/* Styles for logout button */
+.logout-button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: #6B7280; /* Darker gray from existing palette */
+    color: white;
+    border: 1px solid #6B7280;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.logout-button:hover {
+    background-color: #4B5563; /* Even darker gray on hover */
+    border-color: #4B5563;
+}

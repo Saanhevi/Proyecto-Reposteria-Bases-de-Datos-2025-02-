@@ -2,7 +2,7 @@ DROP SCHEMA IF EXISTS ReposteriaDB;
 CREATE SCHEMA ReposteriaDB;
 USE ReposteriaDB;
 CREATE TABLE Cliente (
-    cli_cedula INT PRIMARY KEY,
+    cli_cedula BIGINT PRIMARY KEY,
     cli_nom VARCHAR(50) NOT NULL,
     cli_apellido VARCHAR(50) NOT NULL,
     cli_tel VARCHAR(10) NOT NULL,
@@ -10,7 +10,7 @@ CREATE TABLE Cliente (
 );
 
 CREATE TABLE Empleado (
-    emp_id INT AUTO_INCREMENT PRIMARY KEY,
+    emp_id INT PRIMARY KEY,
     emp_nom VARCHAR(100) NOT NULL,
     emp_tel VARCHAR(10) NOT NULL
 );
@@ -81,20 +81,20 @@ CREATE TABLE ProductoPresentacion (
     pro_id INT NOT NULL,
     tam_id INT NOT NULL,
     prp_precio INT NOT NULL,
-    FOREIGN KEY (pro_id) REFERENCES Producto(pro_id),
+    FOREIGN KEY (pro_id) REFERENCES Producto(pro_id) ON DELETE CASCADE,
     FOREIGN KEY (tam_id) REFERENCES Tamano(tam_id)
 );
 
 CREATE TABLE Pedido (
     ped_id INT AUTO_INCREMENT PRIMARY KEY,
-    cli_cedula INT NOT NULL,
-    emp_id INT NOT NULL,
+    cli_cedula BIGINT,
+    emp_id INT,
     ped_fec DATE NOT NULL,
     ped_hora TIME NOT NULL,
     ped_est ENUM('Pendiente', 'Preparado','Entregado','Anulado') NOT NULL,
     ped_total INT NOT NULL,
     FOREIGN KEY (cli_cedula) REFERENCES Cliente(cli_cedula),
-    FOREIGN KEY (emp_id) REFERENCES Cajero(emp_id)
+    FOREIGN KEY (emp_id) REFERENCES Cajero(emp_id) ON DELETE SET NULL
 );
 
 CREATE TABLE DetallePedido (
@@ -133,3 +133,4 @@ CREATE TABLE DetalleCompra (
     FOREIGN KEY (com_id) REFERENCES Compra(com_id),
     FOREIGN KEY (ing_id) REFERENCES Ingrediente(ing_id)
 );
+

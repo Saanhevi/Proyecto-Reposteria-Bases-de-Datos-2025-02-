@@ -1,0 +1,72 @@
+/* General form styling */
+.form-container {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    max-width: 600px;
+    margin: 30px auto; /* Center the form and add some top/bottom margin */
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-color);
+    font-size: 0.95rem;
+}
+
+.form-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d1d5db; /* Light gray border */
+    border-radius: 6px;
+    font-size: 1rem;
+    color: var(--text-color);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 204, 153, 0.2); /* Light primary color glow */
+    outline: none;
+}
+
+/* Form actions (buttons) */
+.form-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end; /* Align buttons to the right */
+    margin-top: 30px;
+}
+
+
+
+.form-actions .cancel-button {
+    background-color: #f3f4f6; /* Light gray */
+    color: var(--text-color);
+    border: 1px solid #d1d5db;
+}
+
+.form-actions .cancel-button:hover {
+    background-color: #e5e7eb; /* Slightly darker light gray */
+    border-color: #9ca3af;
+}
+
+/* Error messages */
+.error-message {
+    color: #ef4444; /* Red */
+    font-size: 0.875rem;
+    margin-top: 5px;
+}
+
+/* Adjustments for disabled inputs */
+.form-input:disabled {
+    background-color: #e9ecef; /* Lighter background for disabled fields */
+    color: #6c757d; /* Grayer text for disabled fields */
+    cursor: not-allowed;
+}

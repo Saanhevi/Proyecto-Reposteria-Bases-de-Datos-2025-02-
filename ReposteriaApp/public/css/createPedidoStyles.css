@@ -1,0 +1,129 @@
+/* ReposteriaApp/public/css/createPedidoStyles.css */
+
+.form-container-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+.product-adder-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    align-items: flex-end;
+}
+
+.quantity-adder {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
+    align-items: flex-end;
+    margin-top: 1rem;
+}
+
+#add-product {
+    width: 100%;
+}
+
+.summary-title {
+    color: #1F2937;
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 24px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid #E8DCC0;
+    padding-bottom: 16px;
+}
+
+#order-items-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#order-items-table th,
+#order-items-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #F3F4F6;
+    font-size: 14px;
+}
+
+#order-items-table th {
+    font-weight: 600;
+    color: #4B5563;
+    background-color: #F9FAFB;
+}
+
+#order-items-table .item-name {
+    font-weight: 500;
+    color: #1F2937;
+}
+
+#order-items-table .item-quantity,
+#order-items-table .item-price,
+#order-items-table .item-subtotal {
+    text-align: right;
+}
+
+#order-items-table .action-cell {
+    text-align: right;
+}
+
+.summary-total {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #E8DCC0;
+    text-align: right;
+}
+
+.summary-total .total-label {
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.summary-total .total-value {
+    font-weight: 700;
+    font-size: 20px;
+    color: #1F2937;
+}
+
+#client-info {
+    margin-top: 0.5rem;
+    font-size: 14px;
+}
+.input-group {
+    display: flex;
+}
+.input-group .form-input {
+    border-right: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.search-button {
+    border: 1px solid #E8DCC0;
+    padding: 0 15px;
+    background-color: #F9FAFB;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+    cursor: pointer;
+}
+.search-button:hover {
+    background-color: #F3F4F6;
+}
+
+/* Overriding some form styles for this specific view */
+.form-input:focus {
+    border-color: #F4D2D7;
+    box-shadow: 0 0 0 3px rgba(244, 210, 215, 0.5);
+}
+
+.primary-action-button {
+    background-color: #F4D2D7;
+    border-color: #F4D2D7;
+    color: #1F2937;
+    box-shadow: none;
+}
+.primary-action-button:hover {
+    background-color: #e4c1c6;
+    border-color: #e4c1c6;
+}

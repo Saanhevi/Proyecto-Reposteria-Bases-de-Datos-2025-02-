@@ -2,12 +2,16 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\Admin\CompraController;
 use App\Http\Controllers\Admin\ClienteController;
 use App\Http\Controllers\Admin\EmpleadoController;
 use App\Http\Controllers\Admin\CajeroController; // Add this line
 use App\Http\Controllers\Admin\ReposteroController; // Add this line
 use App\Http\Controllers\Admin\DomiciliarioController; // Add this line
 use App\Http\Controllers\Admin\ProductoController; // Add this line
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\PagoController;
+use App\Http\Controllers\Admin\RecetaController;
 
 use App\Http\Controllers\Admin\PedidoController;
 
@@ -37,11 +41,7 @@ Route::get('/', function() {
 
 Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(function () {
 
-    Route::get('/dashboard', function() {
-
-        return view('admin.dashboardAdmin');
-
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/pedidos', [PedidoController::class, 'index'])->name('pedidos.index');
     Route::get('/pedidos/create', [PedidoController::class, 'create'])->name('pedidos.create');
@@ -70,6 +70,10 @@ Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::post('productos/{producto}/presentaciones', [ProductoController::class, 'storePresentacion'])->name('productos.storePresentacion');
 
     Route::delete('presentaciones/{presentacion}', [ProductoController::class, 'destroyPresentacion'])->name('presentaciones.destroy');
+
+    Route::resource('recetas', RecetaController::class)->only(['index']);
+    Route::resource('compras', CompraController::class)->only(['index']);
+    Route::resource('pagos', PagoController::class)->only(['index']);
 
 });
 

@@ -71,7 +71,7 @@ class DashboardController extends Controller
             ->leftJoin('Compra as c', function ($join) {
                 $join->on('dc.com_id', '=', 'c.com_id');
             })
-            ->leftJoin('Proveedor as p', 'c.prov_id', '=', 'p.prov_id')
+            ->leftJoin('proveedor as pr', 'c.prov_id', '=', 'pr.prov_id')
             ->where(function ($query) {
                 $query->whereNull('lp.last_date')
                     ->orWhereColumn('c.com_fec', 'lp.last_date');
@@ -82,7 +82,7 @@ class DashboardController extends Controller
                 'i.ing_stock',
                 'i.ing_reord',
                 'i.ing_um',
-                DB::raw('COALESCE(p.pro_nom, "Sin proveedor") as prov_nom')
+                DB::raw('COALESCE(pr.prov_nom, "Sin proveedor") as prov_nom')
             )
             ->groupBy(
                 'i.ing_id',
@@ -90,7 +90,7 @@ class DashboardController extends Controller
                 'i.ing_stock',
                 'i.ing_reord',
                 'i.ing_um',
-                DB::raw('COALESCE(p.pro_nom, "Sin proveedor")')
+                'prov_nom'
             )
             ->orderBy('i.ing_nom')
             ->get();

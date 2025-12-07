@@ -1,3 +1,5 @@
+USE ReposteriaDB;
+
 -- Script Funciones
 -- Admin 
 
@@ -54,4 +56,3 @@ RETURNS INT DETERMINISTIC
     RETURN total;
     END %%
 DELIMITER ;
-

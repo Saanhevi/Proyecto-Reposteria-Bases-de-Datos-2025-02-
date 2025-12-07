@@ -1,3 +1,5 @@
+USE ReposteriaDB;
+
 -- Consultas
 
 -- Consultas administrador
@@ -14,7 +16,7 @@ SELECT
 FROM Pedido p
 JOIN Cliente c USING (cli_cedula);
 
--- 2. Ver el total de ventas por día
+-- 2. Ver el total de ventas por dia
 
 SELECT 
 ped_fec , 
@@ -24,14 +26,14 @@ WHERE ped_est = 'Entregado'
 GROUP BY ped_fec
 ORDER BY ped_fec;
 
--- 3. Consultar el top de productos más vendidos.
+-- 3. Consultar el top de productos mas vendidos.
 SELECT pro_nom, SUM(dpe_can) AS total_vendidos
-FROM Detallepedido
-JOIN Productopresentacion USING(prp_id)
+FROM DetallePedido
+JOIN ProductoPresentacion USING(prp_id)
 JOIN Producto USING (pro_id)
 GROUP BY pro_nom
-ORDER BY total_vendidos 
-DESC LIMIT 5;
+ORDER BY total_vendidos DESC
+LIMIT 5;
 
 -- 4. Listar los ingredientes con bajo stock 
 SELECT 
@@ -59,7 +61,7 @@ ped_total
 FROM Pedido JOIN Cliente USING(cli_cedula)
 WHERE ped_est = 'Anulado';
 
--- 7. Listar los clientes con mayor número de compras
+-- 7. Listar los clientes con mayor numero de compras
 SELECT 
 cli_nom, 
 cli_apellido,
@@ -84,7 +86,7 @@ JOIN Producto USING (pro_id)
 JOIN Tamano USING (tam_id)
 ORDER BY pro_nom;
 
--- 10. Consultar qué cajeros han participado en cada pedido
+-- 10. Consultar que cajeros han participado en cada pedido
 SELECT emp_nom, ped_fec, ped_hora, ped_total 
 FROM Pedido JOIN Empleado USING (emp_id);
 
@@ -98,7 +100,7 @@ SELECT
 FROM Cliente
 ORDER BY cli_apellido;
 
--- 12.Numero de pagos realizados por tipo de método (efectivo, tarjeta, transferencia).
+-- 12.Numero de pagos realizados por tipo de metodo (efectivo, tarjeta, transferencia).
 SELECT 
 pag_metodo, 
 COUNT(pag_id) AS num_pagos,
@@ -116,7 +118,7 @@ SELECT
 FROM Pedido
 ORDER BY ped_fec DESC;
 
--- 2. Ver el detalle de un pedido específico (productos, cantidades y subtotales).
+-- 2. Ver el detalle de un pedido especifico (productos, cantidades y subtotales).
 SELECT 
 ped_id, 
 pro_nom, 
@@ -151,11 +153,11 @@ FROM Cliente JOIN Pedido USING (cli_cedula)
 WHERE cli_cedula = 1016797812
 ORDER BY ped_fec DESC;
 
--- 5. Visualizar los productos disponibles con sus precios y tamaños.
+-- 5. Visualizar los productos disponibles con sus precios y tamanos.
 SELECT 
 pro_nom, 
-tam_nom, 
-prp_precio
+    tam_nom, 
+    prp_precio
 FROM ProductoPresentacion
 JOIN Producto USING(pro_id)
 JOIN Tamano USING(tam_id)
@@ -196,7 +198,7 @@ ped_hora
 FROM Pedido 
 WHERE ped_est = 'Pendiente';
 
--- 2. Ver el detalle de cada pedido pendiente (productos, cantidades, tamaños).
+-- 2. Ver el detalle de cada pedido pendiente (productos, cantidades, tamanos).
 SELECT 
 ped_id, 
 pro_nom, 
@@ -210,13 +212,13 @@ JOIN Producto USING (pro_id)
 WHERE ped_est = 'Pendiente'
 ORDER BY ped_id;
 
--- 3.Consultar la receta de un producto con un tamaño en específico (ingredientes y cantidades requeridas)
+-- 3.Consultar la receta de un producto con un tamano en especifico (ingredientes y cantidades requeridas)
 SELECT 
 pro_nom, 
-tam_nom, 
-ing_nom, 
-(dre_can * tam_factor) AS cantidad_total,
-ing_um
+    tam_nom, 
+    ing_nom, 
+    (dre_can * tam_factor) AS cantidad_total,
+    ing_um
 FROM Producto
 JOIN ProductoPresentacion USING (pro_id)
 JOIN Tamano USING (tam_id)
@@ -235,11 +237,11 @@ ing_um
 FROM Ingrediente
 ORDER BY ing_nom;
 
--- 5. Ver la cantidad total de cada producto pendiente de preparar (por consolidación de pedidos)
+-- 5. Ver la cantidad total de cada producto pendiente de preparar (por consolidacion de pedidos)
 SELECT 
 pro_nom,
-tam_nom,
-SUM(dpe_can) AS cantidadTotal  
+    tam_nom,
+    SUM(dpe_can) AS cantidadTotal  
 FROM Pedido
 JOIN DetallePedido USING (ped_id)
 JOIN ProductoPresentacion USING (prp_id)
@@ -248,8 +250,8 @@ JOIN Tamano USING (tam_id)
 WHERE ped_est = 'Pendiente'
 GROUP BY pro_nom, tam_nom;
 
--- 6. Consultar la cantidad total por ingrediente necesaria según los pedidos pendientes 
--- (puede variar según los tamaños)
+-- 6. Consultar la cantidad total por ingrediente necesaria segun los pedidos pendientes 
+-- (puede variar segun los tamanos)
 SELECT 
 ing_nom ,
 SUM(dpe_can*dre_can*tam_factor) AS cantidadTotal,

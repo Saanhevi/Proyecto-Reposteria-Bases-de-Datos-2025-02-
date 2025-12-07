@@ -110,11 +110,7 @@ Una vez que todos los requisitos estén instalados:
 2.  **Ejecutar Scripts SQL:**
     *   En tu cliente de MySQL, selecciona la base de datos `ReposteriaDB`.
     *   Ejecuta los siguientes scripts SQL en el ORDEN ESPECIFICADO:
-        1.  `Proyecto Bases de Datos\CreacionTablas.sql`
-        2.  `Proyecto Bases de Datos\InsercionDatos.sql`
-        3.  `Proyecto Bases de Datos\CreacionVistas.sql`
-        4.  `Proyecto Bases de Datos\CreacionUsuariosPerfiles.sql`
-        5.  `Proyecto Bases de Datos\ScriptConsultas.sql` (No requerido)
+        1.  `CreacionTablas.sql → InsercionDatos.sql → CreacionVistas.sql → ScriptFunciones.sql → ScriptProcedimientosAlmacenados.sql → ScriptIndices.sql → CreacionUsuariosPerfiles.sql (y los demás scripts de ejemplo según necesites).`
 
         **Nota:** El script `CreacionUsuariosPerfiles.sql` crea usuarios y roles específicos para la aplicación. Asegúrate de entender su contenido si deseas modificar los usuarios o las contraseñas.
 

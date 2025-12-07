@@ -1,3 +1,5 @@
+USE ReposteriaDB;
+
 -- Script de creación de usuarios y perfiles
 -- Crear rol admin (si no existe)
 CREATE ROLE IF NOT EXISTS 'role_admin'@'localhost';
@@ -69,6 +71,9 @@ GRANT SELECT ON ReposteriaDB.vw_cajero_pedidos_estado TO 'role_cajero'@'localhos
 GRANT SELECT ON ReposteriaDB.vw_cajero_pedidos_pendientes TO 'role_cajero'@'localhost';
 GRANT SELECT ON ReposteriaDB.vw_cajero_pedidos_pendientes_cobro TO 'role_cajero'@'localhost';
 GRANT SELECT ON ReposteriaDB.vw_cajero_productos_disponibles TO 'role_cajero'@'localhost';
+GRANT SELECT ON ReposteriaDB.vw_cajero_pedidos_detalle TO 'role_cajero'@'localhost';
+GRANT SELECT ON ReposteriaDB.vw_cajero_resumen_ventas_dia TO 'role_cajero'@'localhost';
+GRANT SELECT ON ReposteriaDB.vw_cajero_pagos_por_metodo TO 'role_cajero'@'localhost';
 
 -- Crear rol repostero (si no existe)
 CREATE ROLE IF NOT EXISTS 'role_repostero'@'localhost';
@@ -98,5 +103,8 @@ GRANT SELECT ON ReposteriaDB.vw_repostero_detalle_pedidos_pendientes TO 'role_re
 GRANT SELECT ON ReposteriaDB.vw_repostero_ingredientes_necesarios TO 'role_repostero'@'localhost';
 GRANT SELECT ON ReposteriaDB.vw_repostero_pedidos_pendientes TO 'role_repostero'@'localhost';
 GRANT SELECT ON ReposteriaDB.vw_repostero_stock_ingredientes TO 'role_repostero'@'localhost';
+GRANT SELECT ON ReposteriaDB.vw_repostero_pedidos_activos TO 'role_repostero'@'localhost';
+GRANT SELECT ON ReposteriaDB.vw_repostero_requerimientos_pedido TO 'role_repostero'@'localhost';
+GRANT SELECT ON ReposteriaDB.vw_repostero_faltantes_pedido TO 'role_repostero'@'localhost';
 
 SELECT user, host FROM mysql.user;

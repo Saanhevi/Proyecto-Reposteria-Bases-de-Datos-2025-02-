@@ -1,6 +1,7 @@
 DROP SCHEMA IF EXISTS ReposteriaDB;
 CREATE SCHEMA ReposteriaDB;
 USE ReposteriaDB;
+
 CREATE TABLE Cliente (
     cli_cedula BIGINT PRIMARY KEY,
     cli_nom VARCHAR(50) NOT NULL,
@@ -17,7 +18,7 @@ CREATE TABLE Empleado (
 
 CREATE TABLE Cajero (
     emp_id INT PRIMARY KEY,
-    caj_turno ENUM('Mañana','Tarde','Noche') NOT NULL,
+    caj_turno ENUM('Manana','Tarde','Noche') NOT NULL,
     FOREIGN KEY (emp_id) REFERENCES Empleado(emp_id)
 );
 
@@ -28,9 +29,9 @@ CREATE TABLE Repostero (
 );
 
 CREATE TABLE Domiciliario (
-	emp_id INT PRIMARY KEY,
+    emp_id INT PRIMARY KEY,
     dom_medTrans ENUM('Bicicleta','Moto'),
-	FOREIGN KEY (emp_id) REFERENCES Empleado(emp_id)
+    FOREIGN KEY (emp_id) REFERENCES Empleado(emp_id)
 );
 
 CREATE TABLE Proveedor (
@@ -71,7 +72,7 @@ CREATE TABLE Producto (
 
 CREATE TABLE Tamano (
     tam_id INT AUTO_INCREMENT PRIMARY KEY,
-    tam_nom ENUM('Individual','Pequeño','Mediano','Grande') NOT NULL,
+    tam_nom ENUM('Individual','Pequeno','Mediano','Grande') NOT NULL,
     tam_porciones VARCHAR(30) NOT NULL,
     tam_factor DECIMAL(5,2) NOT NULL
 );
@@ -133,4 +134,3 @@ CREATE TABLE DetalleCompra (
     FOREIGN KEY (com_id) REFERENCES Compra(com_id),
     FOREIGN KEY (ing_id) REFERENCES Ingrediente(ing_id)
 );
-

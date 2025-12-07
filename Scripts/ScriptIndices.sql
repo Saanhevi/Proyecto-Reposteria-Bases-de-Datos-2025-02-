@@ -1,3 +1,5 @@
+USE ReposteriaDB;
+
 -- Creacion Indices
 -- Se crean los siguientes indices debido a que se realizaran busquedas,
 -- empleando procedimientos almacenados, teniendo estos atributos como condiciones 

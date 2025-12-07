@@ -1,11 +1,13 @@
+USE ReposteriaDB;
+
 -- ================================================================
 -- Script de actualizaciones y eliminaciones
 --
--- Este archivo contiene operaciones de actualización (UPDATE) y
--- eliminación (DELETE) agrupadas según los permisos de cada rol
--- (Administrador, Cajero y Repostero) en el sistema de repostería.  Para
--- cada operación se presenta primero una versión general con nombres
--- de variables a reemplazar y a depues un ejemplo concreto
+-- Este archivo contiene operaciones de actualizacion (UPDATE) y
+-- eliminacion (DELETE) agrupadas segun los permisos de cada rol
+-- (Administrador, Cajero y Repostero) en el sistema de reposteria.  Para
+-- cada operacion se presenta primero una version general con nombres
+-- de variables a reemplazar y despues un ejemplo concreto
 -- utilizando valores existentes de la BD. 
 -- ================================================================
 
@@ -13,8 +15,8 @@
 ========================================================================
   OPERACIONES PARA EL ROL: ADMINISTRADOR
 
-  El administrador supervisa la operación general del negocio.  Sus
-  funciones incluyen consultar información sobre ventas, compras,
+  El administrador supervisa la operacion general del negocio.  Sus
+  funciones incluyen consultar informacion sobre ventas, compras,
   clientes, productos e inventario; registrar y modificar proveedores,
   productos y recetas; gestionar las compras de ingredientes y
   actualizar sus existencias; y registrar nuevos empleados asignando
@@ -24,15 +26,15 @@
 */
 
 
--- 1. Actualizar el precio de una presentación de producto.
+-- 1. Actualizar el precio de una presentacion de producto.
 
--- Versión general
+-- Version general
 UPDATE ProductoPresentacion
 SET prp_precio = nuevoPrecio
 WHERE pro_id = productoId
   AND tam_id = tamanoId;
 
--- Ejemplo: incrementar el precio de la presentación (pro_id=1, tam_id=1) a 5500
+-- Ejemplo: incrementar el precio de la presentacion (pro_id=1, tam_id=1) a 5500
 UPDATE ProductoPresentacion
 SET prp_precio = 5500
 WHERE pro_id = 1
@@ -40,7 +42,7 @@ WHERE pro_id = 1
 
 -- 2. Ajustar el stock y el punto de reorden de un ingrediente.
 
--- Versión general
+-- Version general
 UPDATE Ingrediente
 SET ing_stock = nuevoStock,
     ing_reord = nuevoReorden
@@ -57,85 +59,85 @@ WHERE ing_id = 1;
 
 -- 3. Actualizar los datos de un proveedor.
 
--- Versión general
+-- Version general
 UPDATE Proveedor
 SET prov_nom = nuevoNombreProveedor,
     prov_tel = nuevoTelefonoProveedor,
     prov_dir = nuevaDireccionProveedor
 WHERE prov_id = proveedorId;
 
--- Ejemplo: actualizar la dirección del proveedor 1
+-- Ejemplo: actualizar la direccion del proveedor 1
 UPDATE Proveedor
 SET prov_dir = 'Calle 99 #88-77'
 WHERE prov_id = 1;
 
--- 4. Actualizar los datos de un empleado (nombre y teléfono).
+-- 4. Actualizar los datos de un empleado (nombre y telefono).
 
--- Versión general
+-- Version general
 UPDATE Empleado
 SET emp_nom = nuevoNombreEmpleado,
     emp_tel = nuevoTelefonoEmpleado
 WHERE emp_id = empleadoId;
 
--- Ejemplo: cambiar el teléfono del empleado 3
+-- Ejemplo: cambiar el telefono del empleado 1016797832
 UPDATE Empleado
 SET emp_tel = '3209876543'
-WHERE emp_id = 3;
+WHERE emp_id = 1016797832;
 
 -- 4a. Actualizar el turno de un cajero.
 
--- Versión general
+-- Version general
 UPDATE Cajero
 SET caj_turno = nuevoTurno
 WHERE emp_id = empleadoId;
 
--- Ejemplo: cambiar el turno del cajero 1 a 'Noche'
+-- Ejemplo: cambiar el turno del cajero 1016797813 a 'Noche'
 UPDATE Cajero
 SET caj_turno = 'Noche'
-WHERE emp_id = 1;
+WHERE emp_id = 1016797813;
 
 -- 4b. Actualizar la especialidad de un repostero.
 
--- Versión general
+-- Version general
 UPDATE Repostero
 SET rep_especialidad = nuevaEspecialidad
 WHERE emp_id = empleadoId;
 
--- Ejemplo: actualizar la especialidad del repostero 3
+-- Ejemplo: actualizar la especialidad del repostero 1016797213
 UPDATE Repostero
-SET rep_especialidad = 'Postres fríos'
-WHERE emp_id = 3;
+SET rep_especialidad = 'Postres frios'
+WHERE emp_id = 1016797213;
 
 
 -- 5. Actualizar el nombre de un producto o su receta asociada.
 
--- Versión general
+-- Version general
 UPDATE Producto
 SET pro_nom = nuevoNombreProducto,
     rec_id  = nuevaRecetaId
 WHERE pro_id = productoId;
 
--- Ejemplo: cambiar el nombre del producto 2 a 'Pie de limón' y asociarlo a la receta 2
+-- Ejemplo: cambiar el nombre del producto 2 a 'Pie de limon' y asociarlo a la receta 2
 UPDATE Producto
-SET pro_nom = 'Pie de limón',
+SET pro_nom = 'Pie de limon',
     rec_id  = 2
 WHERE pro_id = 2;
 
 -- 6. Actualizar el nombre de una receta.
 
--- Versión general
+-- Version general
 UPDATE Receta
 SET rec_nom = nuevoNombreReceta
 WHERE rec_id = recetaId;
 
--- Ejemplo: renombrar la receta 4 a 'Tiramisú Clásico'
+-- Ejemplo: renombrar la receta 4 a 'Tiramisu Clasico'
 UPDATE Receta
-SET rec_nom = 'Tiramisú Clásico'
+SET rec_nom = 'Tiramisu Clasico'
 WHERE rec_id = 4;
 
 -- 7. Ajustar la cantidad de un ingrediente en una receta.
 
--- Versión general
+-- Version general
 UPDATE DetalleReceta
 SET dre_can = nuevaCantidad
 WHERE rec_id = recetaId
@@ -149,7 +151,7 @@ WHERE rec_id = 1
 
 -- 8. Actualizar datos de una compra (fecha o total).
 
--- Versión general
+-- Version general
 UPDATE Compra
 SET com_fec = nuevaFecha,
     com_tot = nuevoTotal
@@ -162,7 +164,7 @@ WHERE com_id = 1;
 
 -- 9. Actualizar detalles de compra (cantidad y precio).
 
--- Versión general
+-- Version general
 UPDATE DetalleCompra
 SET dco_can = nuevaCantidad,
     dco_pre = nuevoPrecio
@@ -178,26 +180,26 @@ WHERE com_id = 1
 
 -- 10. Asignar un empleado existente como cajero con un turno determinado.
 
--- Versión general
+-- Version general
 INSERT INTO Cajero (emp_id, caj_turno) VALUES (empleadoId, nuevoTurno);
 
--- Ejemplo: asignar al empleado 5 como cajero con turno 'Tarde'
-INSERT INTO Cajero (emp_id, caj_turno) VALUES (5, 'Tarde');
+-- Ejemplo: asignar al empleado 1016797223 como cajero con turno 'Tarde'
+INSERT INTO Cajero (emp_id, caj_turno) VALUES (1016797223, 'Tarde');
 
 -- 11. Asignar un empleado existente como repostero con una especialidad.
 
--- Versión general
+-- Version general
 INSERT INTO Repostero (emp_id, rep_especialidad) VALUES (empleadoId, nuevaEspecialidad);
 
--- Ejemplo: asignar al empleado 5 como repostero especializado en 'Tortas al horno'
-INSERT INTO Repostero (emp_id, rep_especialidad) VALUES (5, 'Tortas al horno');
+-- Ejemplo: asignar al empleado 1066280984 como repostero especializado en 'Tortas al horno'
+INSERT INTO Repostero (emp_id, rep_especialidad) VALUES (1066280984, 'Tortas al horno');
 
 /*
 ========================================================================
   OPERACIONES PARA EL ROL: CAJERO
 
-  El cajero interactúa con el cliente durante el proceso de venta.
-  Puede insertar y actualizar información de los clientes, registrar
+  El cajero interactua con el cliente durante el proceso de venta.
+  Puede insertar y actualizar informacion de los clientes, registrar
   nuevos pedidos y sus detalles, registrar los pagos realizados,
   actualizar el estado de los pedidos (Pendiente, Entregado o Anulado)
   y consultar productos y precios. 
@@ -206,7 +208,7 @@ INSERT INTO Repostero (emp_id, rep_especialidad) VALUES (5, 'Tortas al horno');
 
 -- 1. Cambiar el estado de un pedido.
 
--- Versión general
+-- Version general
 UPDATE Pedido
 SET ped_est = nuevoEstado
 WHERE ped_id = pedidoId;
@@ -216,21 +218,21 @@ UPDATE Pedido
 SET ped_est = 'Entregado'
 WHERE ped_id = 4;
 
--- 2. Modificar el método de pago de un pedido.
+-- 2. Modificar el metodo de pago de un pedido.
 
--- Versión general
+-- Version general
 UPDATE Pago
 SET pag_metodo = nuevoMetodoPago
 WHERE pag_id = pagoId;
 
--- Ejemplo: cambiar el método de pago del registro 1 a 'Transferencia'
+-- Ejemplo: cambiar el metodo de pago del registro 1 a 'Transferencia'
 UPDATE Pago
 SET pag_metodo = 'Transferencia'
 WHERE pag_id = 1;
 
 -- 3. Actualizar la cantidad y el subtotal de un detalle de pedido.
 
--- Versión general
+-- Version general
 UPDATE DetallePedido
 SET dpe_can      = nuevaCantidad,
     dpe_subtotal = nuevoSubtotal
@@ -244,15 +246,15 @@ SET dpe_can      = 3,
 WHERE ped_id = 1
   AND prp_id = 1;
 
--- 4. Registrar o modificar la información de un cliente (teléfono y dirección).
+-- 4. Registrar o modificar la informacion de un cliente (telefono y direccion).
 
--- Versión general
+-- Version general
 UPDATE Cliente
 SET cli_tel = nuevoTelefono,
     cli_dir = nuevaDireccion
 WHERE cli_cedula = clienteCedula;
 
--- Ejemplo: actualizar el teléfono y la dirección del cliente 1036897912
+-- Ejemplo: actualizar el telefono y la direccion del cliente 1036897912
 UPDATE Cliente
 SET cli_tel = '3001112222',
     cli_dir = 'Carrera 12 #34-56'
@@ -262,15 +264,15 @@ WHERE cli_cedula = 1036897912;
 ========================================================================
   OPERACIONES PARA EL ROL: REPOSTERO
 
-  El repostero está encargado de la producción.  Puede consultar
+  El repostero esta encargado de la produccion.  Puede consultar
   los pedidos con estado Pendiente o Preparado, consultar las
-  recetas e ingredientes y Actualizar el estado de los pedidos (Pendiente, Entregado o Anulado)..  
+  recetas e ingredientes y Actualizar el estado de los pedidos (Pendiente, Entregado o Anulado).
 ========================================================================
 */
 
 -- 1. Marcar un pedido segun el estado.
 
--- Versión general
+-- Version general
 UPDATE Pedido
 SET ped_est = estado
 WHERE ped_id = pedidoId;

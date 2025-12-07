@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Cajero extends Model
 {
-    protected $table = 'Cajero'; // Explicitly define the table name
+    protected $table = 'Cajero'; 
     protected $primaryKey = 'emp_id';
     public $incrementing = false;
     protected $fillable = ['emp_id', 'caj_turno'];

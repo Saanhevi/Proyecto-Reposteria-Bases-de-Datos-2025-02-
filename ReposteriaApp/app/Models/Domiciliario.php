@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Domiciliario extends Model
 {
-    protected $table = 'Domiciliario'; // Explicitly define the table name
+    protected $table = 'Domiciliario'; 
     protected $primaryKey = 'emp_id';
     public $incrementing = false;
     protected $fillable = ['emp_id', 'dom_medTrans'];

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Repostero extends Model
 {
-    protected $table = 'Repostero'; // Explicitly define the table name
+    protected $table = 'Repostero'; 
     protected $primaryKey = 'emp_id';
     public $incrementing = false;
     protected $fillable = ['emp_id', 'rep_especialidad'];

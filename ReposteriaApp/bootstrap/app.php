@@ -14,6 +14,13 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckUserRole::class
         ]);
+
+        // Añade el middleware SetDatabaseConnection al grupo de middlewares 'web'.
+        // Este middleware se encarga de configurar dinámicamente la conexión a la base de datos
+        // para cada solicitud, utilizando las credenciales del usuario autenticado.
+        $middleware->web(append: [
+            \App\Http\Middleware\SetDatabaseConnection::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

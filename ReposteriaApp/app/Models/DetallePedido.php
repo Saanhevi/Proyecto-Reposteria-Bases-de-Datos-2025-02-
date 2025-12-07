@@ -8,7 +8,7 @@ class DetallePedido extends Model
 {
     protected $table = 'DetallePedido';
     protected $primaryKey = ['ped_id', 'prp_id'];
-    public $incrementing = false; // Composite primary key
+    public $incrementing = false; 
     protected $fillable = ['ped_id', 'prp_id', 'dpe_can', 'dpe_subtotal'];
     public $timestamps = false;
 

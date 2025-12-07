@@ -14,32 +14,37 @@
         <div class="main-content">
             <div class="header">
                 <div class="header-info">
-                    <div class="header-title">Recetas</div>
-                    <div class="header-subtitle">Ingredientes base y presentaciones</div>
+                    <div class="header-title">Gestión de Recetas</div>
+                    <div class="header-subtitle">Administra las recetas y sus ingredientes</div>
                 </div>
                 <div class="header-actions">
-                    <button class="primary-action-button" disabled title="Agregar receta (pendiente de implementación)">Agregar receta</button>
+                    <a href="{{ route('admin.recetas.create') }}" class="primary-action-button">Crear Receta</a>
                 </div>
             </div>
 
-            <div class="card">
-                <div class="card-header" style="justify-content: space-between; align-items: center;">
-                    <div>
-                        <div class="card-title">Listado de recetas</div>
-                        <div class="card-subtitle">Vista alineada a Repostero</div>
-                    </div>
-                    <div class="filters-row" style="gap: 8px;">
-                        <input type="search" id="receta-filter" class="form-input" placeholder="Buscar por nombre...">
-                    </div>
+            @if (session('success'))
+                <div class="alert alert-success">
+                    {{ session('success') }}
                 </div>
-                <div class="table-container compact">
+            @endif
+            @if (session('error'))
+                <div class="alert alert-danger">
+                    {{ session('error') }}
+                </div>
+            @endif
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Listado de Recetas</div>
+                    <input type="search" id="receta-filter" class="form-input" placeholder="Buscar por nombre...">
+                </div>
+                <div class="table-container">
                     <table class="inventory-table" id="recetas-table">
                         <thead>
                             <tr>
                                 <th>ID</th>
                                 <th>Nombre</th>
-                                <th>Ingredientes</th>
-                                <th>Detalle</th>
+                                <th class="text-right">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -47,16 +52,26 @@
                                 <tr>
                                     <td>{{ $receta->rec_id }}</td>
                                     <td>{{ $receta->rec_nom }}</td>
-                                    <td>{{ $receta->ingredientes }}</td>
-                                    <td>{{ $receta->detalle ?? 'Sin ingredientes registrados' }}</td>
+                                    <td class="actions">
+                                        <a href="{{ route('admin.recetas.show', $receta) }}" class="action-button">Ver</a>
+                                        <a href="{{ route('admin.recetas.edit', $receta) }}" class="action-button edit-button">Editar</a>
+                                        <form action="{{ route('admin.recetas.destroy', $receta) }}" method="POST" style="display:inline-block;">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="action-button danger-button" onclick="return confirm('¿Estás seguro de que quieres eliminar esta receta?')">Eliminar</button>
+                                        </form>
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="empty-state">No hay recetas registradas.</td>
+                                    <td colspan="3" class="empty-state">No hay recetas registradas.</td>
                                 </tr>
                             @endforelse
                         </tbody>
                     </table>
+                </div>
+                <div class="pagination-container">
+                    {{ $recetas->links() }}
                 </div>
             </div>
         </div>

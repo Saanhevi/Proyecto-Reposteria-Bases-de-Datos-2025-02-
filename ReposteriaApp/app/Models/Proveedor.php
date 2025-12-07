@@ -8,8 +8,8 @@ class Proveedor extends Model
 {
     protected $table = 'proveedor';
     protected $primaryKey = 'prov_id';
-    public $incrementing = true; // prov_id is AUTO_INCREMENT
-    public $timestamps = false; // Assuming no created_at/updated_at columns in 'proveedor' table
+    public $incrementing = true; 
+    public $timestamps = false; 
 
     protected $fillable = [
         'prov_nom',

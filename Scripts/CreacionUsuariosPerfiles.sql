@@ -34,16 +34,73 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON ReposteriaDB.Proveedor TO 'role_admin'@'
 
 -- Asignar permisos de solo lectura sobre las vistas del administrador
 GRANT SELECT ON ReposteriaDB.vw_admin_pedidos_realizados TO 'role_admin'@'localhost';
-GRANT SELECT ON ReposteriaDB.vw_admin_ventas_dia TO 'role_admin'@'localhost';
 GRANT SELECT ON ReposteriaDB.vw_admin_top_productos TO 'role_admin'@'localhost';
 GRANT SELECT ON ReposteriaDB.vw_admin_ingredientes_bajo_stock TO 'role_admin'@'localhost';
-GRANT SELECT ON ReposteriaDB.vw_admin_historial_compras TO 'role_admin'@'localhost';
 GRANT SELECT ON ReposteriaDB.vw_admin_pedidos_anulados TO 'role_admin'@'localhost';
+GRANT SELECT ON ReposteriaDB.vw_admin_ingredientes TO 'role_admin'@'localhost';
+GRANT SELECT ON ReposteriaDB.vw_admin_clientes TO 'role_admin'@'localhost';
+GRANT SELECT ON ReposteriaDB.vw_admin_proveedores TO 'role_admin'@'localhost';
+GRANT SELECT ON ReposteriaDB.vw_admin_cajeros TO 'role_admin'@'localhost';
+GRANT SELECT ON ReposteriaDB.vw_admin_reposteros TO 'role_admin'@'localhost';
+GRANT SELECT ON ReposteriaDB.vw_admin_domiciliarios TO 'role_admin'@'localhost';
+GRANT SELECT ON ReposteriaDB.vw_admin_pedidos_pagados TO 'role_admin'@'localhost';
+GRANT SELECT ON ReposteriaDB.vw_admin_ventas_por_mes TO 'role_admin'@'localhost';
+GRANT SELECT ON ReposteriaDB.vw_admin_ventas_dia TO 'role_admin'@'localhost';
+GRANT SELECT ON ReposteriaDB.vw_admin_historial_compras TO 'role_admin'@'localhost';
 GRANT SELECT ON ReposteriaDB.vw_admin_clientes_frecuentes TO 'role_admin'@'localhost';
 GRANT SELECT ON ReposteriaDB.vw_admin_clientes_top_gasto TO 'role_admin'@'localhost';
 GRANT SELECT ON ReposteriaDB.vw_admin_productos_disponibles TO 'role_admin'@'localhost';
 GRANT SELECT ON ReposteriaDB.vw_admin_cajeros_pedidos TO 'role_admin'@'localhost';
 GRANT SELECT ON ReposteriaDB.vw_admin_metodo_pago TO 'role_admin'@'localhost';
+
+-- Asignar permisos de ejecución sobre las funciones del administrador
+GRANT EXECUTE ON FUNCTION ReposteriaDB.fn_admin_num_ped_entregados TO 'role_admin'@'localhost';
+GRANT EXECUTE ON FUNCTION ReposteriaDB.fn_admin_num_ped_activos TO 'role_admin'@'localhost';
+GRANT EXECUTE ON FUNCTION ReposteriaDB.fn_admin_num_productos TO 'role_admin'@'localhost';
+GRANT EXECUTE ON FUNCTION ReposteriaDB.fn_admin_num_empleados TO 'role_admin'@'localhost';
+
+-- Asignar permisos de ejecución sobre los procedimientos almacenados
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_insert_cliente TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_actu_cliente TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_find_cliente TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_delete_cliente TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_admin_buscar_clientes TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_admin_buscar_ingredientes TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_insert_ingrediente TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_update_ingrediente TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_delete_ingrediente TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_insert_proveedor TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_update_proveedor TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_delete_proveedor TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_insert_empleado TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_update_empleado TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_delete_empleado TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_insert_cajero TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_update_cajero TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_delete_cajero TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_insert_repostero TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_update_repostero TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_delete_repostero TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_insert_receta TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_update_receta TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_delete_receta TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_insert_detalle_receta TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_delete_detalle_receta TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_insert_producto TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_update_producto TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_delete_producto TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_insert_producto_presentacion TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_update_producto_presentacion TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_delete_producto_presentacion TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_insert_compra TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_insert_detalle_compra TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_cajero_crear_pedido TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_cajero_insert_detalle_pedido TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_cajero_actualizar_estado_pedido TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_cajero_registrar_pago TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_repostero_preparar_pedido TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_repostero_marcar_entregado TO 'role_admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE ReposteriaDB.pas_repostero_marcar_anulado TO 'role_admin'@'localhost';
 
 -- Crear rol cajero (si no existe)
 CREATE ROLE IF NOT EXISTS 'role_cajero'@'localhost';

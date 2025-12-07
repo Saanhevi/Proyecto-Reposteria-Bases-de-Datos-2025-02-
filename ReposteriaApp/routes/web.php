@@ -5,10 +5,10 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\Admin\CompraController;
 use App\Http\Controllers\Admin\ClienteController;
 use App\Http\Controllers\Admin\EmpleadoController;
-use App\Http\Controllers\Admin\CajeroController; // Add this line
-use App\Http\Controllers\Admin\ReposteroController; // Add this line
-use App\Http\Controllers\Admin\DomiciliarioController; // Add this line
-use App\Http\Controllers\Admin\ProductoController; // Add this line
+use App\Http\Controllers\Admin\CajeroController; 
+use App\Http\Controllers\Admin\ReposteroController; 
+use App\Http\Controllers\Admin\DomiciliarioController; 
+use App\Http\Controllers\Admin\ProductoController; 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PagoController;
 use App\Http\Controllers\Admin\RecetaController;
@@ -78,7 +78,7 @@ Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(functi
 
     Route::delete('presentaciones/{presentacion}', [ProductoController::class, 'destroyPresentacion'])->name('presentaciones.destroy');
 
-    Route::resource('recetas', RecetaController::class)->only(['index']);
+    Route::resource('recetas', RecetaController::class);
     Route::resource('compras', CompraController::class)->only(['index','create','store','edit','update']);
     Route::resource('pagos', PagoController::class)->only(['index']);
 

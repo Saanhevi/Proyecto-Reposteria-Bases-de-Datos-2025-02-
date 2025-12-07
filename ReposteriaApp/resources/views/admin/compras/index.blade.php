@@ -26,6 +26,17 @@
                 </div>
             </div>
 
+            @if (session('success'))
+                <div style="background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; padding: 10px; margin-bottom: 15px; border-radius: 4px;">
+                    {{ session('success') }}
+                </div>
+            @endif
+            @if (session('error'))
+                <div style="background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; padding: 10px; margin-bottom: 15px; border-radius: 4px;">
+                    {{ session('error') }}
+                </div>
+            @endif
+
             <div class="table-container">
                 <table class="inventory-table">
                     <thead>
@@ -34,8 +45,7 @@
                             <th>Fecha</th>
                             <th>Proveedor</th>
                             <th>Total</th>
-                            <th>Detalle</th>
-                            <th></th>
+                            <th class="text-right">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -45,8 +55,15 @@
                                 <td>{{ $compra->com_fec }}</td>
                                 <td>{{ $compra->prov_nom }}</td>
                                 <td>${{ number_format($compra->com_tot, 0, ',', '.') }}</td>
-                                <td>{{ $compra->detalle ?? 'Sin detalle de ingredientes' }}</td>
-                                <td><a class="filter-button" href="{{ route('admin.compras.edit', $compra->com_id) }}">Editar</a></td>
+                                <td class="actions">
+                                    <a href="{{ route('admin.compras.show', $compra->com_id) }}" class="action-button">Ver</a>
+                                    <a href="{{ route('admin.compras.edit', $compra->com_id) }}" class="action-button edit-button">Editar</a>
+                                    <form action="{{ route('admin.compras.destroy', $compra->com_id) }}" method="POST" style="display:inline-block;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="action-button delete-button" onclick="return confirm('¿Estás seguro de que quieres eliminar esta compra?')">Eliminar</button>
+                                    </form>
+                                </td>
                             </tr>
                         @empty
                             <tr>
@@ -55,6 +72,9 @@
                         @endforelse
                     </tbody>
                 </table>
+                <div class="pagination-container">
+                    {{ $compras->links() }}
+                </div>
             </div>
         </div>
     </div>

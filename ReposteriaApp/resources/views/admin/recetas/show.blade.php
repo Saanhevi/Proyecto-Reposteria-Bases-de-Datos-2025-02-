@@ -6,6 +6,7 @@
     <title>Detalle de Receta - Repostería</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/dashboardStyles.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/BotonStyle.css') }}">
 </head>
 <body>
     <div class="container">
@@ -17,16 +18,27 @@
                     <div class="header-title">Detalle de la Receta</div>
                 </div>
                 <div class="header-actions">
-                    <a href="{{ route('admin.recetas.index') }}" class="cancel-button">Volver al Listado</a>
+                    <a href="{{ route('admin.recetas.index') }}" class="action-button edit-button">Volver al Listado</a>
                 </div>
             </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">{{ $receta->rec_nom }}</h2>
+            <div class="dashboard-content">
+                <div class="info-card">
+                    <h3 class="info-card-title">Resumen de la Receta</h3>
+                    <div class="info-card-item">
+                        <span class="info-card-label">ID Receta:</span>
+                        <span class="info-card-value">#{{ $receta->rec_id }}</span>
+                    </div>
+                    <div class="info-card-item">
+                        <span class="info-card-label">Nombre:</span>
+                        <span class="info-card-value">{{ $receta->rec_nom }}</span>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <h3 class="summary-title">Ingredientes</h3>
+
+                <div class="inventory-card">
+                    <div class="inventory-header">
+                        <div class="inventory-title">Ingredientes de la Receta</div>
+                    </div>
                     <div class="table-container">
                         <table class="inventory-table">
                             <thead>

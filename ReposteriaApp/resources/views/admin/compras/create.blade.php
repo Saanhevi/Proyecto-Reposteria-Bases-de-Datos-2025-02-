@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nueva Compra</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/dashboardStyles.css') }}">
     <link rel="stylesheet" href="{{ asset('css/BotonStyle.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/formStyles.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/createRecetaStyles.css') }}">
 </head>
 <body>
     <div class="container">
@@ -22,7 +25,7 @@
                 </div>
             </div>
 
-            <div class="card">
+            <div class="form-container" style="max-width: 1200px; margin: 24px auto;">
                 <form method="POST" action="{{ route('admin.compras.store') }}" id="compra-form">
                     @csrf
                     <div class="form-grid">
@@ -41,19 +44,17 @@
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Detalle de compra</label>
-                        <div class="product-adder-grid">
-                            <select id="ing-selector" class="form-input">
-                                <option value="">Ingrediente</option>
-                                @foreach ($ingredientes as $ing)
-                                    <option value="{{ $ing->ing_id }}">{{ $ing->ing_nom }}</option>
-                                @endforeach
-                            </select>
-                            <input type="number" id="cant-input" class="form-input" placeholder="Cantidad" min="0.01" step="0.01">
-                            <input type="number" id="precio-input" class="form-input" placeholder="Precio unitario" min="0" step="0.01">
-                            <button type="button" id="add-detalle" class="primary-action-button">Agregar</button>
-                        </div>
+                    <h3 class="summary-title">Detalle de compra</h3>
+                    <div class="product-adder-grid">
+                        <select id="ing-selector" class="form-input">
+                            <option value="">Ingrediente</option>
+                            @foreach ($ingredientes as $ing)
+                                <option value="{{ $ing->ing_id }}">{{ $ing->ing_nom }}</option>
+                            @endforeach
+                        </select>
+                        <input type="number" id="cant-input" class="form-input" placeholder="Cantidad" min="0.01" step="0.01">
+                        <input type="number" id="precio-input" class="form-input" placeholder="Precio unitario" min="0" step="0.01">
+                        <button type="button" id="add-detalle" class="secondary-action-button">Agregar</button>
                     </div>
 
                     <div class="table-container" style="padding:0;">
@@ -74,11 +75,7 @@
                         <span class="total-label">Total:</span>
                         <span class="total-value" id="total-compra">$0</span>
                     </div>
-
-                    <div class="form-group">
-                        <label><input type="checkbox" name="confirmar" value="1"> Confirmar y actualizar stock ahora</label>
-                    </div>
-
+                    
                     <div id="hidden-items"></div>
 
                     <div class="form-actions">
@@ -113,7 +110,7 @@
                     <td>${item.cantidad}</td>
                     <td>$${item.precio.toLocaleString('es-CO')}</td>
                     <td>$${subtotal.toLocaleString('es-CO')}</td>
-                    <td><button type=\"button\" data-idx=\"${idx}\" class=\"filter-button secondary\">Quitar</button></td>
+                    <td><button type=\"button\" data-idx=\"${idx}\" class=\"action-button delete-button\">Quitar</button></td>
                 `;
                 tbody.appendChild(tr);
 

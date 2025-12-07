@@ -79,7 +79,7 @@ Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::delete('presentaciones/{presentacion}', [ProductoController::class, 'destroyPresentacion'])->name('presentaciones.destroy');
 
     Route::resource('recetas', RecetaController::class);
-    Route::resource('compras', CompraController::class)->only(['index','create','store','edit','update']);
+    Route::resource('compras', CompraController::class);
     Route::resource('pagos', PagoController::class)->only(['index']);
 
 });

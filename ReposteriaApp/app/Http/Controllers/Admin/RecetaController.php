@@ -20,7 +20,7 @@ class RecetaController extends Controller
     public function create()
     {
         $ingredientes = DB::table('ingrediente')->get();
-        return view('admin.recetas.create', compact('ingrediente'));
+        return view('admin.recetas.create', compact('ingredientes'));
     }
 
     public function store(Request $request)
@@ -63,12 +63,22 @@ class RecetaController extends Controller
     public function edit(Receta $receta)
     {
         $ingredientes = DB::table('ingrediente')->get();
-        $detalles = DB::table('detallereceta')
-            ->where('rec_id', $receta->rec_id)
-            ->get()
-            ->keyBy('ing_id');
+        $detalles = DB::table('detallereceta as dr')
+            ->join('ingrediente as i', 'dr.ing_id', '=', 'i.ing_id')
+            ->where('dr.rec_id', $receta->rec_id)
+            ->select('i.ing_id', 'i.ing_nom', 'dr.dre_can', 'i.ing_um')
+            ->get();
 
-        return view('admin.recetas.edit', compact('receta', 'ingredientes', 'detalles'));
+        $recipeIngredients = $detalles->map(function($detalle) {
+            return [
+                'id' => (string) $detalle->ing_id,
+                'name' => htmlspecialchars($detalle->ing_nom, ENT_QUOTES, 'UTF-8'),
+                'quantity' => (float) $detalle->dre_can,
+                'um' => htmlspecialchars($detalle->ing_um, ENT_QUOTES, 'UTF-8'),
+            ];
+        })->toArray();
+
+        return view('admin.recetas.edit', compact('receta', 'ingredientes', 'recipeIngredients'));
     }
 
     public function update(Request $request, Receta $receta)

@@ -12,18 +12,15 @@ class CompraController extends Controller
     {
         $compras = DB::table('Compra as c')
             ->join('Proveedor as p', 'c.prov_id', '=', 'p.prov_id')
-            ->leftJoin('DetalleCompra as dc', 'c.com_id', '=', 'dc.com_id')
-            ->leftJoin('Ingrediente as i', 'dc.ing_id', '=', 'i.ing_id')
             ->select(
                 'c.com_id',
                 'c.com_fec',
                 'c.com_tot',
-                'p.prov_nom',
-                DB::raw("GROUP_CONCAT(CONCAT(i.ing_nom, ' x', dc.dco_can, ' ', i.ing_um) SEPARATOR ', ') as detalle")
+                'p.prov_nom'
             )
             ->groupBy('c.com_id', 'c.com_fec', 'c.com_tot', 'p.prov_nom')
             ->orderByDesc('c.com_fec')
-            ->get();
+            ->paginate(10); // Paginate with 10 items per page
 
         return view('admin.compras.index', compact('compras'));
     }
@@ -44,7 +41,7 @@ class CompraController extends Controller
             'items.*.ing_id' => 'required|exists:Ingrediente,ing_id',
             'items.*.dco_can' => 'required|numeric|min:0.01',
             'items.*.dco_pre' => 'required|numeric|min:0',
-            'confirmar' => 'nullable|boolean',
+            // 'confirmar' => 'nullable|boolean', // Removed validation for 'confirmar'
         ]);
 
         DB::transaction(function () use ($request) {
@@ -67,9 +64,8 @@ class CompraController extends Controller
                 ]);
             }
 
-            if ($request->boolean('confirmar')) {
-                $this->actualizarStockCompra($comId);
-            }
+            // Always update stock since checkbox is removed
+            $this->actualizarStockCompra($comId);
         });
 
         return redirect()->route('admin.compras.index')->with('success', 'Compra registrada correctamente.');
@@ -101,7 +97,7 @@ class CompraController extends Controller
             'items.*.ing_id' => 'required|exists:Ingrediente,ing_id',
             'items.*.dco_can' => 'required|numeric|min:0.01',
             'items.*.dco_pre' => 'required|numeric|min:0',
-            'confirmar' => 'nullable|boolean',
+            // 'confirmar' => 'nullable|boolean', // Removed validation for 'confirmar'
         ]);
 
         DB::transaction(function () use ($request, $id) {
@@ -128,12 +124,43 @@ class CompraController extends Controller
                 ]);
             }
 
-            if ($request->boolean('confirmar')) {
-                $this->actualizarStockCompra($id);
-            }
+            // Always update stock since checkbox is removed
+            $this->actualizarStockCompra($id);
         });
 
         return redirect()->route('admin.compras.index')->with('success', 'Compra actualizada correctamente.');
+    }
+
+    public function show($id)
+    {
+        $compra = DB::table('Compra')->where('com_id', $id)->first();
+        abort_unless($compra, 404);
+
+        $detalles = DB::table('DetalleCompra as dc')
+            ->join('Ingrediente as i', 'dc.ing_id', '=', 'i.ing_id')
+            ->where('dc.com_id', $id)
+            ->select('dc.ing_id', 'dc.dco_can', 'dc.dco_pre', 'i.ing_nom')
+            ->get();
+        
+        $proveedor = DB::table('Proveedor')->where('prov_id', $compra->prov_id)->first();
+
+        return view('admin.compras.show', compact('compra', 'detalles', 'proveedor'));
+    }
+
+    public function destroy($id)
+    {
+        DB::transaction(function () use ($id) {
+            // First, revert the stock for the items in this purchase
+            $this->revertirStockCompra($id);
+
+            // Then, delete the purchase details
+            DB::table('DetalleCompra')->where('com_id', $id)->delete();
+
+            // Finally, delete the purchase itself
+            DB::table('Compra')->where('com_id', $id)->delete();
+        });
+
+        return redirect()->route('admin.compras.index')->with('success', 'Compra eliminada correctamente y stock actualizado.');
     }
 
     private function actualizarStockCompra(int $comId): void
@@ -143,6 +170,16 @@ class CompraController extends Controller
             DB::table('Ingrediente')
                 ->where('ing_id', $detalle->ing_id)
                 ->update(['ing_stock' => DB::raw('ing_stock + ' . $detalle->dco_can)]);
+        }
+    }
+
+    private function revertirStockCompra(int $comId): void
+    {
+        $detalles = DB::table('DetalleCompra')->where('com_id', $comId)->get();
+        foreach ($detalles as $detalle) {
+            DB::table('Ingrediente')
+                ->where('ing_id', $detalle->ing_id)
+                ->update(['ing_stock' => DB::raw('ing_stock - ' . $detalle->dco_can)]);
         }
     }
 }

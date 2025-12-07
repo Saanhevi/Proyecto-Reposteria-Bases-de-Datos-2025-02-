@@ -1,0 +1,42 @@
+.ingredient-group {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 16px;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.product-adder-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.quantity-adder {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+    align-items: flex-end;
+    margin-top: 1rem;
+}
+
+#ingredient-table {
+    width: 100%;
+    margin-top: 1rem;
+    border-collapse: collapse;
+}
+
+#ingredient-table th,
+#ingredient-table td {
+    text-align: left;
+    padding: 12px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+#ingredient-table th {
+    background-color: #f9fafb;
+}
+
+.action-cell {
+    text-align: right;
+}

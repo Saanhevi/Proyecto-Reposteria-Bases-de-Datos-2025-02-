@@ -32,7 +32,7 @@
                         @method('PUT')
                         <div class="form-group">
                             <label for="cli_cedula" class="form-label">Cédula</label>
-                            <input type="text" name="cli_cedula" id="cli_cedula" class="form-input" value="{{ old('cli_cedula', $cliente->cli_cedula) }}" required>
+                            <input type="text" name="cli_cedula" id="cli_cedula" class="form-input" value="{{ old('cli_cedula', $cliente->cli_cedula) }}" required readonly style="background-color: #f3f4f6; cursor: not-allowed;">
                             @error('cli_cedula')
                                 <p class="error-message">{{ $message }}</p>
                             @enderror

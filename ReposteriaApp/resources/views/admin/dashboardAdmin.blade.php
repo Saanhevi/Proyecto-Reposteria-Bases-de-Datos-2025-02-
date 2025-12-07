@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/dashboardStyles.css') }}">
     <link rel="stylesheet" href="{{ asset('css/BotonStyle.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/search-styles.css') }}">
 </head>
 <body>
     <div class="container">
@@ -35,9 +36,8 @@
                 <div class="stats-grid stats-grid-4-cols">
                     <div class="stat-card">
                         <div class="stat-info">
-                            <div class="stat-label">Ventas Hoy</div>
-                            <div class="stat-value">${{ number_format($ventasHoy, 0, ',', '.') }}</div>
-                            <div class="stat-change positive">Ventas entregadas del día</div>
+                            <div class="stat-label">Pedidos Entregados Hoy</div>
+                            <div class="stat-value">{{ $ventasHoy }}</div>
                         </div>
                         <div class="stat-icon sales">
                             <svg width="10" height="16" viewBox="0 0 10 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -49,7 +49,6 @@
                         <div class="stat-info">
                             <div class="stat-label">Pedidos Activos</div>
                             <div class="stat-value">{{ $pedidosActivos }}</div>
-                            <div class="stat-change neutral">Pendientes de entrega</div>
                         </div>
                         <div class="stat-icon orders">
                             <svg width="12" height="16" viewBox="0 0 12 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -61,7 +60,6 @@
                         <div class="stat-info">
                             <div class="stat-label">Productos</div>
                             <div class="stat-value">{{ $totalProductos }}</div>
-                            <div class="stat-change warning">{{ $productosBajoStock }} bajo stock</div>
                         </div>
                         <div class="stat-icon products">
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -73,7 +71,6 @@
                         <div class="stat-info">
                             <div class="stat-label">Empleados</div>
                             <div class="stat-value">{{ $empleados }}</div>
-                            <div class="stat-change info">{{ $cajeros }} cajeros, {{ $reposteros }} reposteros</div>
                         </div>
                         <div class="stat-icon employees">
                             <svg width="20" height="16" viewBox="0 0 20 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -116,17 +113,25 @@
                 </div>
 
                 <!-- Inventory and Orders -->
-                <div class="grid-2-cols">
+                <div class="card-container">
                     <div class="card">
-                        <div class="card-header" style="justify-content: space-between; align-items: center;">
-                            <div>
-                                <div class="card-title">Estado del Inventario</div>
-                                <div class="card-subtitle">Resumen de ingredientes</div>
-                            </div>
-                            <div class="filters-row" style="gap: 8px;">
-                                <input type="search" id="admin-inv-filter" class="form-input" placeholder="Buscar ingrediente...">
-                            </div>
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <h3 class="chart-title">Estado del Inventario</h3>
+                        <div class="inventory-search-container">
+                            <form action="{{ route('admin.dashboard') }}" method="GET" style="display: flex; gap: 8px;">
+                                <div class="inventory-search-input-wrapper">
+                                    <span class="inventory-search-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                                        </svg>
+                                    </span>
+                                    <input type="search" name="search_ingredient" class="inventory-search-input" placeholder="Buscar ingrediente..." value="{{ request('search_ingredient') }}">
+                                </div>
+                                <button type="submit" class="primary-action-button btn-small">Buscar</button>
+                                <a href="{{ route('admin.dashboard') }}" class="cancel-button btn-small">Limpiar</a>
+                            </form>
                         </div>
+                    </div>
                         <div class="table-container compact" style="max-height: 360px; overflow-y: auto;">
                             <table class="inventory-table" id="admin-inv-table">
                                 <thead>
@@ -134,87 +139,25 @@
                                         <th>Ingrediente</th>
                                         <th>Stock actual</th>
                                         <th>Stock mínimo</th>
-                                        <th>Proveedor reciente</th>
-                                        <th>Estado</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @forelse ($estadoInventario as $item)
                                         <tr>
                                             <td>{{ $item->ing_nom }}</td>
-                                            <td>{{ $item->ing_stock }} {{ $item->ing_um }}</td>
-                                            <td>{{ $item->ing_reord }} {{ $item->ing_um }}</td>
-                                            <td>{{ $item->prov_nom }}</td>
-                                            <td>
-                                                @if ($item->ing_stock <= $item->ing_reord)
-                                                    <span class="status-badge low">Bajo Stock</span>
-                                                @else
-                                                    <span class="status-badge sufficient">Suficiente</span>
-                                                @endif
-                                            </td>
+                                            <td>{{ $item->ing_stock_um }}</td>
+                                            <td>{{ $item->ing_reord_um }}</td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="5" class="empty-state">No hay ingredientes registrados.</td>
+                                            <td colspan="3" class="empty-state">No hay ingredientes registrados.</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
                             </table>
                         </div>
                     </div>
-
-                    <div class="card">
-                        <div class="card-header" style="justify-content: space-between; align-items: center;">
-                            <div>
-                                <div class="card-title">Pedidos Recientes</div>
-                                <div class="card-subtitle">Últimas ventas registradas</div>
-                            </div>
-                            <div class="filters-row" style="gap: 8px;">
-                                <input type="search" id="admin-pedidos-filter" class="form-input" placeholder="Buscar por cliente o estado">
-                                <span class="tag pill">Live</span>
-                            </div>
-                        </div>
-                        <div class="table-container compact" style="max-height: 360px; overflow-y: auto;">
-                            <table class="inventory-table" id="admin-pedidos-table">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Cliente</th>
-                                        <th>Productos</th>
-                                        <th>Total</th>
-                                        <th>Estado</th>
-                                        <th>Fecha</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse ($pedidosRecientes as $pedido)
-                                        <tr>
-                                            <td>#{{ $pedido->ped_id }}</td>
-                                            <td>{{ trim(($pedido->cli_nom ?? '') . ' ' . ($pedido->cli_apellido ?? '')) ?: 'Cliente ocasional' }}</td>
-                                            <td>{{ $resumenPedidos[$pedido->ped_id] ?? 'Sin detalles' }}</td>
-                                            <td>${{ number_format($pedido->ped_total, 0, ',', '.') }}</td>
-                                            <td>
-                                                @php
-                                                    $statusClass = [
-                                                        'Pendiente' => 'pending',
-                                                        'Preparado' => 'info',
-                                                        'Entregado' => 'completed',
-                                                        'Anulado' => 'cancelled',
-                                                    ][$pedido->ped_est] ?? 'pending';
-                                                @endphp
-                                                <span class="status-badge {{ $statusClass }}">{{ $pedido->ped_est }}</span>
-                                            </td>
-                                            <td>{{ $pedido->ped_fec }}</td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="6" class="empty-state">No hay pedidos recientes.</td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                </div>
                 </div>
             </div>
         </div>
@@ -307,158 +250,14 @@
     }
 
     if (productosData.length) {
-        const productoLabels = productosData.map(item => `${item.pro_nom} (${item.tam_nom})`);
-        const productoValues = productosData.map(item => Number(item.cantidad));
+        const productoLabels = productosData.map(item => item.pro_nom);
+        const productoValues = productosData.map(item => Number(item.total_vendidos));
         buildPieChart('productosPieChart', productoLabels, productoValues);
     }
 
-    // filtros locales
-    (function(){
-        const invInput = document.getElementById('admin-inv-filter');
-        const invRows = Array.from(document.querySelectorAll('#admin-inv-table tbody tr'));
-        if (invInput) {
-            invInput.addEventListener('input', () => {
-                const q = invInput.value.toLowerCase();
-                invRows.forEach(r => {
-                    r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
-                });
-            });
-        }
 
-        const pedInput = document.getElementById('admin-pedidos-filter');
-        const pedRows = Array.from(document.querySelectorAll('#admin-pedidos-table tbody tr'));
-        if (pedInput) {
-            pedInput.addEventListener('input', () => {
-                const q = pedInput.value.toLowerCase();
-                pedRows.forEach(r => {
-                    r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
-                });
-            });
-        }
-    })();
 </script>
 </body>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    const ventasData = @json($ventasPorMes);
-    const productosData = @json($productosMasVendidos);
-
-    const palette = [
-        '#2563EB', '#EA580C', '#16A34A', '#9333EA', '#F59E0B', '#0EA5E9',
-        '#EF4444', '#10B981', '#8B5CF6', '#EC4899', '#F97316', '#22D3EE'
-    ];
-
-    function buildPieChart(canvasId, labels, values) {
-        const ctx = document.getElementById(canvasId);
-        if (!ctx) return;
-
-        const colors = labels.map((_, idx) => palette[idx % palette.length]);
-
-        new Chart(ctx, {
-            type: 'pie',
-            data: {
-                labels,
-                datasets: [{
-                    data: values,
-                    backgroundColor: colors,
-                    borderColor: '#ffffff',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { position: 'bottom' },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const value = context.parsed;
-                                return `${context.label}: ${value.toLocaleString()}`;
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    function buildBarChart(canvasId, labels, values) {
-        const ctx = document.getElementById(canvasId);
-        if (!ctx) return;
-
-        const colors = labels.map((_, idx) => palette[idx % palette.length]);
-
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels,
-                datasets: [{
-                    data: values,
-                    backgroundColor: colors,
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const value = context.parsed.y;
-                                return `${context.label}: ${value.toLocaleString()}`;
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: { precision: 0 }
-                    }
-                }
-            }
-        });
-    }
-
-    if (ventasData.length) {
-        const ventasLabels = ventasData.map(item => item.mes);
-        const ventasValues = ventasData.map(item => Number(item.total));
-        buildBarChart('ventasBarChart', ventasLabels, ventasValues);
-    }
-
-    if (productosData.length) {
-        const topProductos = productosData.slice(0, 4);
-        const productoLabels = topProductos.map(item => `${item.pro_nom} (${item.tam_nom})`);
-        const productoValues = topProductos.map(item => Number(item.cantidad));
-        buildPieChart('productosPieChart', productoLabels, productoValues);
-    }
-
-    // Filtros locales en tablas
-    (function(){
-        const invInput = document.getElementById('admin-inv-filter');
-        const invRows = Array.from(document.querySelectorAll('#admin-inv-table tbody tr'));
-        if (invInput) {
-            invInput.addEventListener('input', () => {
-                const q = invInput.value.toLowerCase();
-                invRows.forEach(r => {
-                    r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
-                });
-            });
-        }
-
-        const pedInput = document.getElementById('admin-pedidos-filter');
-        const pedRows = Array.from(document.querySelectorAll('#admin-pedidos-table tbody tr'));
-        if (pedInput) {
-            pedInput.addEventListener('input', () => {
-                const q = pedInput.value.toLowerCase();
-                pedRows.forEach(r => {
-                    r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
-                });
-            });
-        }
-    })();
-</script>
 </html>
 
 

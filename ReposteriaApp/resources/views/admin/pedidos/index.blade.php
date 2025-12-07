@@ -57,7 +57,7 @@
                         @forelse ($pedidos as $pedido)
                             <tr>
                                 <td>{{ $pedido->cli_cedula }}</td>
-                                <td>{{ $pedido->cli_nom }} {{ $pedido->cli_apellido }}</td>
+                                <td>{{ $pedido->cli_nombre_completo }}</td>
                                 <td>{{ $pedido->cajero_nom ?? 'N/A' }}</td>
                                 <td>{{ $pedido->ped_fec }}</td>
                                 <td>{{ $pedido->ped_hora }}</td>

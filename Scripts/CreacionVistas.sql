@@ -4,6 +4,7 @@
 DROP VIEW IF EXISTS vw_admin_pedidos_realizados;
 CREATE VIEW vw_admin_pedidos_realizados AS
 SELECT 
+    p.ped_id,
     c.cli_cedula,
     CONCAT(c.cli_nom, ' ', c.cli_apellido) AS cli_nombre_completo,
     e.emp_nom AS cajero_nom,
@@ -130,6 +131,16 @@ SELECT
 FROM Pago 
 JOIN Pedido USING (ped_id)
 JOIN Cliente USING (cli_cedula);
+-- 12. Ventas por mes                                                                         
+DROP VIEW IF EXISTS vw_admin_ventas_por_mes;                                                  
+CREATE VIEW vw_admin_ventas_por_mes AS                                                        
+SELECT                                                                                        
+     DATE_FORMAT(ped_fec, '%Y-%m') as mes,                                                     
+     SUM(ped_total) as total                                                                   
+FROM Pedido                                                                                   
+WHERE ped_est = 'Entregado'                                                                   
+GROUP BY mes                                                                                  
+ORDER BY mes; 
 
 -- Vistas Cajero
 -- 1. Consultar todos los pedidos registrados por fecha y estado
@@ -257,3 +268,14 @@ JOIN Ingrediente USING (ing_id)
 WHERE ped_est = 'Pendiente'
 GROUP BY ing_nom, ing_um
 ORDER BY ing_nom;
+
+-- 12. Ventas por mes
+DROP VIEW IF EXISTS vw_admin_ventas_por_mes;
+CREATE VIEW vw_admin_ventas_por_mes AS
+SELECT
+    DATE_FORMAT(ped_fec, '%Y-%m') as mes,
+    SUM(ped_total) as total
+FROM Pedido
+WHERE ped_est = 'Entregado'
+GROUP BY mes
+ORDER BY mes;

@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/dashboardStyles.css') }}">
     <link rel="stylesheet" href="{{ asset('css/BotonStyle.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/search-styles.css') }}">
 </head>
 <body>
     <div class="container">
@@ -37,6 +38,27 @@
                     {{ session('error') }}
                 </div>
             @endif
+
+            <!-- Search bar -->
+            <div class="card" style="margin-bottom: 24px; background: white; border-radius: 12px; border: 1px solid #E8DCC0; padding: 25px;">
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 0;">
+                    <h3 class="chart-title">Buscar Clientes</h3>
+                    <div class="inventory-search-container">
+                        <form action="{{ route('admin.clientes.index') }}" method="GET" style="display: flex; gap: 8px;">
+                            <div class="inventory-search-input-wrapper">
+                                <span class="inventory-search-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                                    </svg>
+                                </span>
+                                <input type="search" name="search_client" class="inventory-search-input" placeholder="Buscar por nombre o cédula..." value="{{ request('search_client') }}">
+                            </div>
+                            <button type="submit" class="primary-action-button btn-small">Buscar</button>
+                            <a href="{{ route('admin.clientes.index') }}" class="cancel-button btn-small">Limpiar</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
             
             <!-- Client Table -->
             <div class="table-container">

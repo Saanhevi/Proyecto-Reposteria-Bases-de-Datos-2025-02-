@@ -50,3 +50,6 @@ ReposteriaApp/public/storage
 # PHPUnit
 .phpunit.result.cache
 .phpactor.json
+
+
+ReposteriaApp/.vite/

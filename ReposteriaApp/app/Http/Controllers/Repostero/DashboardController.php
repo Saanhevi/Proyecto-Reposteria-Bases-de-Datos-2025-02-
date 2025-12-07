@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Repostero;
 
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
@@ -12,34 +12,27 @@ class DashboardController extends Controller
     public function index()
     {
         $today = Carbon::today();
-
-        $ventasHoy = DB::table('Pedido')
-            ->whereDate('ped_fec', $today)
-            ->where('ped_est', 'Entregado')
-            ->sum('ped_total');
+        $invFilter = request('inv_filter');
 
         $pedidosActivos = DB::table('Pedido')
+            ->whereIn('ped_est', ['Pendiente', 'Preparado'])
+            ->count();
+
+        $pedidosPendientes = DB::table('Pedido')
             ->where('ped_est', 'Pendiente')
             ->count();
 
         $totalProductos = DB::table('Producto')->count();
 
-        $productosBajoStock = DB::table('Ingrediente')
+        $totalIngredientes = DB::table('Ingrediente')->count();
+
+        $ingredientesBajoStock = DB::table('Ingrediente')
             ->whereColumn('ing_stock', '<=', 'ing_reord')
             ->count();
 
-        $empleados = DB::table('Empleado')->count();
-        $cajeros = DB::table('Cajero')->count();
-        $reposteros = DB::table('Repostero')->count();
-
-        $ventasPorMes = DB::table('Pedido')
-            ->select(
-                DB::raw("DATE_FORMAT(ped_fec, '%Y-%m') as mes"),
-                DB::raw('SUM(ped_total) as total')
-            )
-            ->where('ped_est', 'Entregado')
-            ->groupBy('mes')
-            ->orderBy('mes')
+        $stockChart = DB::table('Ingrediente')
+            ->select('ing_nom', 'ing_stock', 'ing_reord')
+            ->orderBy('ing_nom')
             ->get();
 
         $productosMasVendidos = DB::table('DetallePedido as dp')
@@ -53,7 +46,7 @@ class DashboardController extends Controller
             )
             ->groupBy('p.pro_nom', 't.tam_nom')
             ->orderByDesc('cantidad')
-            ->limit(10)
+            ->limit(5)
             ->get();
 
         $latestPurchases = DB::table('DetalleCompra as dc')
@@ -61,7 +54,7 @@ class DashboardController extends Controller
             ->select('dc.ing_id', DB::raw('MAX(c.com_fec) as last_date'))
             ->groupBy('dc.ing_id');
 
-        $estadoInventario = DB::table('Ingrediente as i')
+        $estadoInventarioQuery = DB::table('Ingrediente as i')
             ->leftJoinSub($latestPurchases, 'lp', function ($join) {
                 $join->on('i.ing_id', '=', 'lp.ing_id');
             })
@@ -92,8 +85,13 @@ class DashboardController extends Controller
                 'i.ing_um',
                 DB::raw('COALESCE(p.prov_nom, "Sin proveedor")')
             )
-            ->orderBy('i.ing_nom')
-            ->get();
+            ->orderBy('i.ing_nom');
+
+        if ($invFilter === 'low') {
+            $estadoInventarioQuery->havingRaw('MIN(i.ing_stock <= i.ing_reord)');
+        }
+
+        $estadoInventario = $estadoInventarioQuery->get();
 
         $pedidosRecientes = DB::table('Pedido as pe')
             ->leftJoin('Cliente as c', 'pe.cli_cedula', '=', 'c.cli_cedula')
@@ -114,19 +112,40 @@ class DashboardController extends Controller
 
         $resumenPedidos = $this->construirResumenPedidos($detallesRecientes);
 
-        return view('admin.dashboardAdmin', [
-            'ventasHoy' => $ventasHoy,
+        $pedidosTrabajo = DB::table('Pedido as pe')
+            ->leftJoin('Cliente as c', 'pe.cli_cedula', '=', 'c.cli_cedula')
+            ->select('pe.ped_id', 'pe.ped_total', 'pe.ped_est', 'pe.ped_fec', 'c.cli_nom', 'c.cli_apellido')
+            ->whereIn('pe.ped_est', ['Pendiente', 'Preparado'])
+            ->orderByDesc('pe.ped_fec')
+            ->orderByDesc('pe.ped_id')
+            ->limit(15)
+            ->get();
+
+        $detallesTrabajo = DB::table('DetallePedido as dp')
+            ->join('ProductoPresentacion as pp', 'dp.prp_id', '=', 'pp.prp_id')
+            ->join('Producto as p', 'pp.pro_id', '=', 'p.pro_id')
+            ->join('Tamano as t', 'pp.tam_id', '=', 't.tam_id')
+            ->whereIn('dp.ped_id', $pedidosTrabajo->pluck('ped_id'))
+            ->select('dp.ped_id', 'p.pro_nom', 't.tam_nom', 'dp.dpe_can')
+            ->get()
+            ->groupBy('ped_id');
+
+        $resumenTrabajo = $this->construirResumenPedidos($detallesTrabajo);
+
+        return view('repostero.dashboardRepostero', [
             'pedidosActivos' => $pedidosActivos,
+            'pedidosPendientes' => $pedidosPendientes,
             'totalProductos' => $totalProductos,
-            'productosBajoStock' => $productosBajoStock,
-            'empleados' => $empleados,
-            'cajeros' => $cajeros,
-            'reposteros' => $reposteros,
-            'ventasPorMes' => $ventasPorMes,
+            'totalIngredientes' => $totalIngredientes,
+            'ingredientesBajoStock' => $ingredientesBajoStock,
+            'stockChart' => $stockChart,
             'productosMasVendidos' => $productosMasVendidos,
             'estadoInventario' => $estadoInventario,
             'pedidosRecientes' => $pedidosRecientes,
             'resumenPedidos' => $resumenPedidos,
+            'pedidosTrabajo' => $pedidosTrabajo,
+            'resumenTrabajo' => $resumenTrabajo,
+            'invFilter' => $invFilter,
         ]);
     }
 

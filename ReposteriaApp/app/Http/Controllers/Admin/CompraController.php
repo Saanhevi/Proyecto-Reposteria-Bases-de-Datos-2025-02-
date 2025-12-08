@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class CompraController extends Controller
 {
@@ -44,29 +45,36 @@ class CompraController extends Controller
             // 'confirmar' => 'nullable|boolean', // Removed validation for 'confirmar'
         ]);
 
-        DB::transaction(function () use ($request) {
-            $total = collect($request->items)->reduce(function ($carry, $item) {
-                return $carry + ($item['dco_can'] * $item['dco_pre']);
-            }, 0);
+        try {
+            DB::transaction(function () use ($request) {
+                $total = collect($request->items)->reduce(function ($carry, $item) {
+                    return $carry + ($item['dco_can'] * $item['dco_pre']);
+                }, 0);
 
-            $comId = DB::table('Compra')->insertGetId([
-                'prov_id' => $request->prov_id,
-                'com_fec' => $request->com_fec,
-                'com_tot' => $total,
-            ]);
-
-            foreach ($request->items as $item) {
-                DB::table('DetalleCompra')->insert([
-                    'com_id' => $comId,
-                    'ing_id' => $item['ing_id'],
-                    'dco_can' => $item['dco_can'],
-                    'dco_pre' => $item['dco_pre'],
+                $resultado = DB::select('CALL pas_insert_compra(?, ?, ?)', [
+                    $request->prov_id,
+                    $request->com_fec,
+                    $total,
                 ]);
-            }
 
-            // Always update stock since checkbox is removed
-            $this->actualizarStockCompra($comId);
-        });
+                $comId = $resultado[0]->com_id ?? null;
+                if (!$comId) {
+                    throw new \RuntimeException('No se pudo obtener el ID de la compra.');
+                }
+
+                foreach ($request->items as $item) {
+                    DB::select('CALL pas_insert_detalle_compra(?, ?, ?, ?)', [
+                        $comId,
+                        $item['ing_id'],
+                        $item['dco_can'],
+                        $item['dco_pre'],
+                    ]);
+                }
+            });
+        } catch (\Throwable $e) {
+            Log::error('Error al registrar compra: '.$e->getMessage());
+            return back()->withInput()->with('error', 'No se pudo registrar la compra.');
+        }
 
         return redirect()->route('admin.compras.index')->with('success', 'Compra registrada correctamente.');
     }
@@ -100,33 +108,36 @@ class CompraController extends Controller
             // 'confirmar' => 'nullable|boolean', // Removed validation for 'confirmar'
         ]);
 
-        DB::transaction(function () use ($request, $id) {
-            $total = collect($request->items)->reduce(function ($carry, $item) {
-                return $carry + ($item['dco_can'] * $item['dco_pre']);
-            }, 0);
+        try {
+            DB::transaction(function () use ($request, $id) {
+                $total = collect($request->items)->reduce(function ($carry, $item) {
+                    return $carry + ($item['dco_can'] * $item['dco_pre']);
+                }, 0);
 
-            DB::table('Compra')
-                ->where('com_id', $id)
-                ->update([
-                    'prov_id' => $request->prov_id,
-                    'com_fec' => $request->com_fec,
-                    'com_tot' => $total,
-                ]);
+                DB::table('Compra')
+                    ->where('com_id', $id)
+                    ->update([
+                        'prov_id' => $request->prov_id,
+                        'com_fec' => $request->com_fec,
+                        'com_tot' => $total,
+                    ]);
 
-            DB::table('DetalleCompra')->where('com_id', $id)->delete();
+                // Limpiar e insertar detalle usando PAS (triggers actualizan stock)
+                DB::table('DetalleCompra')->where('com_id', $id)->delete();
 
-            foreach ($request->items as $item) {
-                DB::table('DetalleCompra')->insert([
-                    'com_id' => $id,
-                    'ing_id' => $item['ing_id'],
-                    'dco_can' => $item['dco_can'],
-                    'dco_pre' => $item['dco_pre'],
-                ]);
-            }
-
-            // Always update stock since checkbox is removed
-            $this->actualizarStockCompra($id);
-        });
+                foreach ($request->items as $item) {
+                    DB::select('CALL pas_insert_detalle_compra(?, ?, ?, ?)', [
+                        $id,
+                        $item['ing_id'],
+                        $item['dco_can'],
+                        $item['dco_pre'],
+                    ]);
+                }
+            });
+        } catch (\Throwable $e) {
+            Log::error('Error al actualizar compra: '.$e->getMessage());
+            return back()->withInput()->with('error', 'No se pudo actualizar la compra.');
+        }
 
         return redirect()->route('admin.compras.index')->with('success', 'Compra actualizada correctamente.');
     }
@@ -149,37 +160,16 @@ class CompraController extends Controller
 
     public function destroy($id)
     {
-        DB::transaction(function () use ($id) {
-            // First, revert the stock for the items in this purchase
-            $this->revertirStockCompra($id);
-
-            // Then, delete the purchase details
-            DB::table('DetalleCompra')->where('com_id', $id)->delete();
-
-            // Finally, delete the purchase itself
-            DB::table('Compra')->where('com_id', $id)->delete();
-        });
+        try {
+            DB::transaction(function () use ($id) {
+                DB::table('DetalleCompra')->where('com_id', $id)->delete();
+                DB::table('Compra')->where('com_id', $id)->delete();
+            });
+        } catch (\Throwable $e) {
+            Log::error('Error al eliminar compra: '.$e->getMessage());
+            return redirect()->route('admin.compras.index')->with('error', 'No se pudo eliminar la compra.');
+        }
 
         return redirect()->route('admin.compras.index')->with('success', 'Compra eliminada correctamente y stock actualizado.');
-    }
-
-    private function actualizarStockCompra(int $comId): void
-    {
-        $detalles = DB::table('DetalleCompra')->where('com_id', $comId)->get();
-        foreach ($detalles as $detalle) {
-            DB::table('Ingrediente')
-                ->where('ing_id', $detalle->ing_id)
-                ->update(['ing_stock' => DB::raw('ing_stock + ' . $detalle->dco_can)]);
-        }
-    }
-
-    private function revertirStockCompra(int $comId): void
-    {
-        $detalles = DB::table('DetalleCompra')->where('com_id', $comId)->get();
-        foreach ($detalles as $detalle) {
-            DB::table('Ingrediente')
-                ->where('ing_id', $detalle->ing_id)
-                ->update(['ing_stock' => DB::raw('ing_stock - ' . $detalle->dco_can)]);
-        }
     }
 }

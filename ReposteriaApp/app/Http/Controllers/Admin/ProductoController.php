@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\DetallePedido;
 use App\Models\Producto;
 use App\Models\ProductoPresentacion;
 use App\Models\Receta;
 use App\Models\Tamano;
-use App\Models\DetallePedido; // Add this line
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class ProductoController extends Controller
 {
@@ -17,7 +19,11 @@ class ProductoController extends Controller
      */
     public function index()
     {
-        $productos = Producto::all();
+        $productos = Producto::with('receta')
+            ->withCount('presentaciones')
+            ->orderBy('pro_nom')
+            ->get();
+
         return view('admin.productos.index', compact('productos'));
     }
 
@@ -26,7 +32,10 @@ class ProductoController extends Controller
      */
     public function create()
     {
-        // User requested to implement this later
+        $recetas = Receta::orderBy('rec_nom')->get();
+        $tamanos = Tamano::orderBy('tam_porciones')->get();
+
+        return view('admin.productos.create', compact('recetas', 'tamanos'));
     }
 
     /**
@@ -34,7 +43,70 @@ class ProductoController extends Controller
      */
     public function store(Request $request)
     {
-        // User requested to implement this later
+        $presentaciones = collect($request->input('presentaciones', []))
+            ->filter(fn ($presentacion) => isset($presentacion['tam_id']));
+
+        $data = [
+            'pro_nom' => $request->input('pro_nom'),
+            'rec_id' => $request->input('rec_id'),
+            'presentaciones' => $presentaciones->toArray(),
+        ];
+
+        $validator = Validator::make(
+            $data,
+            [
+                'pro_nom' => 'required|string|max:100',
+                'rec_id' => 'required|exists:Receta,rec_id',
+                'presentaciones' => 'required|array|min:1',
+                'presentaciones.*.tam_id' => 'required|exists:Tamano,tam_id',
+                'presentaciones.*.precio' => 'required|numeric|min:0',
+            ],
+            [],
+            [
+                'pro_nom' => 'nombre del producto',
+                'rec_id' => 'receta base',
+                'presentaciones.*.precio' => 'precio',
+            ]
+        );
+
+        $validator->after(function ($validator) use ($presentaciones) {
+            if ($presentaciones->pluck('tam_id')->duplicates()->isNotEmpty()) {
+                $validator->errors()->add('presentaciones', 'Cada tamaño solo puede agregarse una vez.');
+            }
+        });
+
+        $validated = $validator->validate();
+
+        try {
+            DB::transaction(function () use ($validated) {
+                $productoResult = DB::select('CALL pas_insert_producto(?, ?)', [
+                    $validated['pro_nom'],
+                    $validated['rec_id'],
+                ]);
+
+                $proId = $productoResult[0]->pro_id ?? null;
+
+                if (!$proId) {
+                    throw new \RuntimeException('No se pudo obtener el identificador del producto.');
+                }
+
+                foreach ($validated['presentaciones'] as $presentacion) {
+                    DB::select('CALL pas_insert_producto_presentacion(?, ?, ?)', [
+                        $proId,
+                        $presentacion['tam_id'],
+                        $presentacion['precio'],
+                    ]);
+                }
+            });
+        } catch (\Throwable $e) {
+            return back()
+                ->withInput()
+                ->with('error', 'No se pudo crear el producto. Por favor intenta de nuevo.')
+                ->withErrors(['store' => $e->getMessage()]);
+        }
+
+        return redirect()->route('admin.productos.index')
+            ->with('success', 'Producto creado con éxito.');
     }
 
     /**
@@ -42,10 +114,10 @@ class ProductoController extends Controller
      */
     public function edit(string $id)
     {
-        $presentacion = ProductoPresentacion::with(['producto', 'tamano'])->findOrFail($id);
-        $productos = Producto::all(); // For selecting product
-        $tamanos = Tamano::all(); // For selecting tamano
-        return view('admin.productos.edit', compact('presentacion', 'productos', 'tamanos'));
+        $presentacion = ProductoPresentacion::with(['producto.receta', 'tamano'])->findOrFail($id);
+        $recetas = Receta::orderBy('rec_nom')->get();
+
+        return view('admin.productos.edit', compact('presentacion', 'recetas'));
     }
 
     /**
@@ -53,28 +125,36 @@ class ProductoController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $presentacion = ProductoPresentacion::findOrFail($id);
+        $presentacion = ProductoPresentacion::with('producto')->findOrFail($id);
 
         $request->validate([
-            'pro_id' => 'required|exists:Producto,pro_id',
-            'tam_id' => 'required|exists:Tamano,tam_id',
+            'pro_nom' => 'required|string|max:100',
+            'rec_id' => 'required|exists:Receta,rec_id',
             'prp_precio' => 'required|numeric|min:0',
-            'pro_nom' => 'required|string|max:100', // Assuming product name can be updated here
         ]);
 
-        // Update Producto name
-        $producto = Producto::findOrFail($request->pro_id);
-        $producto->update(['pro_nom' => $request->pro_nom]);
+        try {
+            DB::transaction(function () use ($request, $presentacion) {
+                DB::statement('CALL pas_update_producto(?, ?, ?)', [
+                    $presentacion->pro_id,
+                    $request->pro_nom,
+                    $request->rec_id,
+                ]);
 
-        // Update ProductoPresentacion
-        $presentacion->update([
-            'pro_id' => $request->pro_id,
-            'tam_id' => $request->tam_id,
-            'prp_precio' => $request->prp_precio,
-        ]);
+                DB::statement('CALL pas_update_producto_presentacion(?, ?)', [
+                    $presentacion->prp_id,
+                    $request->prp_precio,
+                ]);
+            });
+        } catch (\Throwable $e) {
+            return back()
+                ->withInput()
+                ->with('error', 'No se pudo actualizar la información.')
+                ->withErrors(['update' => $e->getMessage()]);
+        }
 
-        return redirect()->route('admin.productos.index')
-                         ->with('success', 'Producto actualizado con éxito');
+        return redirect()->route('admin.productos.showPresentaciones', $presentacion->pro_id)
+            ->with('success', 'Producto y presentación actualizados con éxito.');
     }
 
     /**
@@ -83,19 +163,23 @@ class ProductoController extends Controller
     public function destroy(string $id)
     {
         $producto = Producto::with('presentaciones')->findOrFail($id);
+        $presentacionIds = $producto->presentaciones->pluck('prp_id');
 
-        // Check if any of the product's presentations are in DetallePedido
-        foreach ($producto->presentaciones as $presentacion) {
-            if (\App\Models\DetallePedido::where('prp_id', $presentacion->prp_id)->exists()) {
-                return redirect()->route('admin.productos.index')
-                                 ->with('error', 'Este producto se encuentra en pedidos y no puede ser eliminado.');
-            }
+        if (DetallePedido::whereIn('prp_id', $presentacionIds)->exists()) {
+            return redirect()->route('admin.productos.index')
+                ->with('error', 'Este producto se encuentra en pedidos y no puede ser eliminado.');
         }
 
-        $producto->delete();
+        try {
+            DB::statement('CALL pas_delete_producto(?)', [$id]);
+        } catch (\Throwable $e) {
+            return redirect()->route('admin.productos.index')
+                ->with('error', 'No se pudo eliminar el producto.')
+                ->withErrors(['delete' => $e->getMessage()]);
+        }
 
         return redirect()->route('admin.productos.index')
-                         ->with('success', 'Producto eliminado con éxito');
+            ->with('success', 'Producto eliminado con éxito.');
     }
 
     /**
@@ -105,16 +189,21 @@ class ProductoController extends Controller
     {
         $presentacion = ProductoPresentacion::findOrFail($id);
 
-        // Check if the presentation is in DetallePedido
-        if (\App\Models\DetallePedido::where('prp_id', $presentacion->prp_id)->exists()) {
+        if (DetallePedido::where('prp_id', $presentacion->prp_id)->exists()) {
             return redirect()->route('admin.productos.showPresentaciones', $presentacion->pro_id)
-                             ->with('error', 'Esta presentación se encuentra en pedidos y no puede ser eliminada.');
+                ->with('error', 'Esta presentación se encuentra en pedidos y no puede ser eliminada.');
         }
 
-        $presentacion->delete();
+        try {
+            DB::statement('CALL pas_delete_producto_presentacion(?)', [$presentacion->prp_id]);
+        } catch (\Throwable $e) {
+            return redirect()->route('admin.productos.showPresentaciones', $presentacion->pro_id)
+                ->with('error', 'No se pudo eliminar la presentación.')
+                ->withErrors(['delete' => $e->getMessage()]);
+        }
 
         return redirect()->route('admin.productos.showPresentaciones', $presentacion->pro_id)
-                         ->with('success', 'Presentación eliminada con éxito');
+            ->with('success', 'Presentación eliminada con éxito.');
     }
 
     /**
@@ -122,7 +211,7 @@ class ProductoController extends Controller
      */
     public function showPresentaciones(string $id)
     {
-        $producto = Producto::with('presentaciones.tamano')->findOrFail($id);
+        $producto = Producto::with(['receta', 'presentaciones.tamano'])->findOrFail($id);
         return view('admin.productos.show_presentaciones', compact('producto'));
     }
 
@@ -131,8 +220,8 @@ class ProductoController extends Controller
      */
     public function createPresentacion(string $pro_id)
     {
-        $producto = Producto::findOrFail($pro_id);
-        $tamanos = Tamano::all();
+        $producto = Producto::with('receta')->findOrFail($pro_id);
+        $tamanos = Tamano::orderBy('tam_porciones')->get();
         return view('admin.productos.create_presentacion', compact('producto', 'tamanos'));
     }
 
@@ -145,7 +234,6 @@ class ProductoController extends Controller
             'tam_id' => [
                 'required',
                 'exists:Tamano,tam_id',
-                // Custom rule to prevent duplicate presentations for the same product and size
                 function ($attribute, $value, $fail) use ($pro_id) {
                     if (ProductoPresentacion::where('pro_id', $pro_id)->where('tam_id', $value)->exists()) {
                         $fail('Ya existe una presentación para este producto con el tamaño seleccionado.');
@@ -155,13 +243,19 @@ class ProductoController extends Controller
             'prp_precio' => 'required|numeric|min:0',
         ]);
 
-        ProductoPresentacion::create([
-            'pro_id' => $pro_id,
-            'tam_id' => $request->tam_id,
-            'prp_precio' => $request->prp_precio,
-        ]);
+        try {
+            DB::select('CALL pas_insert_producto_presentacion(?, ?, ?)', [
+                $pro_id,
+                $request->tam_id,
+                $request->prp_precio,
+            ]);
+        } catch (\Throwable $e) {
+            return redirect()->route('admin.productos.showPresentaciones', $pro_id)
+                ->with('error', 'No se pudo crear la presentación.')
+                ->withErrors(['store' => $e->getMessage()]);
+        }
 
         return redirect()->route('admin.productos.showPresentaciones', $pro_id)
-                         ->with('success', 'Presentación agregada con éxito');
+            ->with('success', 'Presentación agregada con éxito.');
     }
 }

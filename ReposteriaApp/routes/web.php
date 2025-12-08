@@ -68,7 +68,7 @@ Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(functi
 
     Route::resource('domiciliarios', DomiciliarioController::class)->except(['index', 'show']);
 
-    Route::resource('productos', ProductoController::class)->except(['create', 'store', 'show']);
+    Route::resource('productos', ProductoController::class)->except(['show']);
 
     Route::get('productos/{producto}/presentaciones', [ProductoController::class, 'showPresentaciones'])->name('productos.showPresentaciones');
 

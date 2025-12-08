@@ -30,7 +30,7 @@
                 </div>
                 <div class="table-container compact">
                     <div class="accordion-list" id="product-accordion">
-                        @forelse ($productos as $proId => $lista)
+                        @forelse ($productos as $proNom => $lista)
                             @php $first = $lista->first(); @endphp
                             <details class="accordion-item" data-name="{{ strtolower($first->pro_nom) }}">
                                 <summary>

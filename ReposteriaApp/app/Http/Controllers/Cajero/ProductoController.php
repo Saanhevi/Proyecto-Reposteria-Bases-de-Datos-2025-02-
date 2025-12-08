@@ -9,14 +9,21 @@ class ProductoController extends Controller
 {
     public function index()
     {
-        $productos = DB::table('Producto as p')
-            ->leftJoin('ProductoPresentacion as pp', 'p.pro_id', '=', 'pp.pro_id')
-            ->leftJoin('Tamano as t', 'pp.tam_id', '=', 't.tam_id')
-            ->select('p.pro_id', 'p.pro_nom', 'pp.prp_id', 'pp.prp_precio', 't.tam_nom')
-            ->orderBy('p.pro_nom')
-            ->orderBy('t.tam_nom')
-            ->get()
-            ->groupBy('pro_id');
+        // Usa vista pensada para catálogo de cajero
+        $catalogo = DB::table('vw_cajero_productos_disponibles')
+            ->orderBy('pro_nom')
+            ->orderBy('tam_nom')
+            ->get();
+
+        $productos = $catalogo->groupBy('pro_nom')->map(function ($items) {
+            return $items->map(function ($item) {
+                return (object) [
+                    'pro_nom' => $item->pro_nom,
+                    'tam_nom' => $item->tam_nom,
+                    'prp_precio' => $item->prp_precio,
+                ];
+            });
+        });
 
         return view('cajero.productos.index', compact('productos'));
     }

@@ -18,13 +18,11 @@ class DashboardController extends Controller
 
         $totalProductos = DB::select('SELECT fn_admin_num_productos() as result')[0]->result;
 
-        $productosBajoStock = DB::table('Ingrediente')
-            ->whereColumn('ing_stock', '<=', 'ing_reord')
-            ->count();
+        $productosBajoStock = DB::table('vw_admin_ingredientes_bajo_stock')->count();
 
         $empleados = DB::select('SELECT fn_admin_num_empleados() as result')[0]->result;
-        $cajeros = DB::table('Cajero')->count();
-        $reposteros = DB::table('Repostero')->count();
+        $cajeros = DB::table('vw_admin_cajeros')->count();
+        $reposteros = DB::table('vw_admin_reposteros')->count();
 
         $ventasPorMes = DB::table('vw_admin_ventas_por_mes')->get();
 

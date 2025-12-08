@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Producto;
 use App\Models\Receta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -12,7 +13,6 @@ class RecetaController extends Controller
 {
     public function index()
     {
-        // Obtener todas las recetas con paginación
         $recetas = Receta::orderBy('rec_nom')->paginate(10);
         return view('admin.recetas.index', compact('recetas'));
     }
@@ -32,19 +32,29 @@ class RecetaController extends Controller
             'ingredientes.*.cantidad' => 'required|numeric|min:0.01',
         ]);
 
-        DB::transaction(function () use ($request) {
-            // Crear la receta
-            $receta = Receta::create(['rec_nom' => $request->rec_nom]);
+        try {
+            DB::transaction(function () use ($request) {
+                $recetaResult = DB::select('CALL pas_insert_receta(?)', [$request->rec_nom]);
+                $recetaId = $recetaResult[0]->rec_id ?? null;
 
-            // Añadir los detalles de la receta
-            foreach ($request->ingredientes as $ingrediente) {
-                DB::table('detallereceta')->insert([
-                    'rec_id' => $receta->rec_id,
-                    'ing_id' => $ingrediente['id'],
-                    'dre_can' => $ingrediente['cantidad'],
-                ]);
-            }
-        });
+                if (!$recetaId) {
+                    throw new \RuntimeException('No se pudo obtener el ID de la receta.');
+                }
+
+                foreach ($request->ingredientes as $ingrediente) {
+                    DB::statement('CALL pas_insert_detalle_receta(?, ?, ?)', [
+                        $recetaId,
+                        $ingrediente['id'],
+                        $ingrediente['cantidad'],
+                    ]);
+                }
+            });
+        } catch (\Throwable $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'No se pudo crear la receta.')
+                ->withErrors(['store' => $e->getMessage()]);
+        }
 
         return redirect()->route('admin.recetas.index')->with('success', 'Receta creada con éxito.');
     }
@@ -69,7 +79,7 @@ class RecetaController extends Controller
             ->select('i.ing_id', 'i.ing_nom', 'dr.dre_can', 'i.ing_um')
             ->get();
 
-        $recipeIngredients = $detalles->map(function($detalle) {
+        $recipeIngredients = $detalles->map(function ($detalle) {
             return [
                 'id' => (string) $detalle->ing_id,
                 'name' => htmlspecialchars($detalle->ing_nom, ENT_QUOTES, 'UTF-8'),
@@ -90,40 +100,54 @@ class RecetaController extends Controller
             'ingredientes.*.cantidad' => 'required|numeric|min:0.01',
         ]);
 
-        DB::transaction(function () use ($request, $receta) {
-            // Actualizar el nombre de la receta
-            $receta->update(['rec_nom' => $request->rec_nom]);
+        try {
+            DB::transaction(function () use ($request, $receta) {
+                DB::statement('CALL pas_update_receta(?, ?)', [$receta->rec_id, $request->rec_nom]);
 
-            // Eliminar los detalles antiguos
-            DB::table('detallereceta')->where('rec_id', $receta->rec_id)->delete();
+                $nuevosIngredientes = collect($request->ingredientes);
+                $nuevosIds = $nuevosIngredientes->pluck('id')->map(fn ($id) => (int) $id);
 
-            // Añadir los nuevos detalles
-            foreach ($request->ingredientes as $ingrediente) {
-                DB::table('detallereceta')->insert([
-                    'rec_id' => $receta->rec_id,
-                    'ing_id' => $ingrediente['id'],
-                    'dre_can' => $ingrediente['cantidad'],
-                ]);
-            }
-        });
+                foreach ($nuevosIngredientes as $ingrediente) {
+                    DB::statement('CALL pas_insert_detalle_receta(?, ?, ?)', [
+                        $receta->rec_id,
+                        $ingrediente['id'],
+                        $ingrediente['cantidad'],
+                    ]);
+                }
+
+                $ingredientesActuales = DB::table('DetalleReceta')
+                    ->where('rec_id', $receta->rec_id)
+                    ->pluck('ing_id');
+
+                $paraEliminar = $ingredientesActuales->diff($nuevosIds);
+
+                foreach ($paraEliminar as $ingId) {
+                    DB::statement('CALL pas_delete_detalle_receta(?, ?)', [$receta->rec_id, $ingId]);
+                }
+            });
+        } catch (\Throwable $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'No se pudo actualizar la receta.')
+                ->withErrors(['update' => $e->getMessage()]);
+        }
 
         return redirect()->route('admin.recetas.index')->with('success', 'Receta actualizada con éxito.');
     }
 
     public function destroy(Receta $receta)
     {
-        // Validar si la receta está siendo usada por un producto
-        $isUsed = DB::table('producto')->where('rec_id', $receta->rec_id)->exists();
-        if ($isUsed) {
+        if (Producto::where('rec_id', $receta->rec_id)->exists()) {
             return redirect()->route('admin.recetas.index')->with('error', 'No se puede eliminar la receta porque está asociada a un producto.');
         }
 
-        DB::transaction(function () use ($receta) {
-            // Eliminar detalles de la receta
-            DB::table('detallereceta')->where('rec_id', $receta->rec_id)->delete();
-            // Eliminar la receta
-            $receta->delete();
-        });
+        try {
+            DB::statement('CALL pas_delete_receta(?)', [$receta->rec_id]);
+        } catch (\Throwable $e) {
+            return redirect()->route('admin.recetas.index')
+                ->with('error', 'No se pudo eliminar la receta.')
+                ->withErrors(['delete' => $e->getMessage()]);
+        }
 
         return redirect()->route('admin.recetas.index')->with('success', 'Receta eliminada con éxito.');
     }

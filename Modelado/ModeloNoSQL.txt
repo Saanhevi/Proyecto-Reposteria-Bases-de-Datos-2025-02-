@@ -1,0 +1,112 @@
+Modelo NoSQL (referencial, simplificado)
+
+Propósito: ilustrar cómo se representaría el dominio en un modelo documental (sin claves foráneas), usando estructuras embebidas.solo un boceto de colecciones y documentos.
+
+1) Colección: clientes
+{
+  "_id": "cli_103",
+  "nombre": "Ana",
+  "apellido": "Torres",
+  "telefono": "3001234567",
+  "direccion": "Cra 10 #10-10",
+  "pedidos_recientes": [
+    { "ped_id": "ped_5001", "fecha": "2025-01-05", "total": 45000, "estado": "Entregado" }
+  ]
+}
+
+2) Colección: empleados
+{
+  "_id": "emp_201",
+  "nombre": "Carlos Pérez",
+  "telefono": "3100000000",
+  "rol": "cajero",           // valores: cajero | repostero | domiciliario | admin
+  "turno": "Tarde",          // solo para cajero
+  "especialidad": null,      // solo para repostero
+  "medio_transporte": null   // solo para domiciliario
+}
+
+3) Colección: ingredientes
+{
+  "_id": "ing_01",
+  "nombre": "Harina de trigo",
+  "unidad": "kg",
+  "stock": 25.5,
+  "punto_reorden": 5
+}
+
+4) Colección: recetas
+{
+  "_id": "rec_10",
+  "nombre": "Bizcochuelo base",
+  "ingredientes": [
+    { "ing_id": "ing_01", "nombre": "Harina de trigo", "cantidad": 0.50, "unidad": "kg" },
+    { "ing_id": "ing_02", "nombre": "Huevos", "cantidad": 6, "unidad": "unidad" },
+    { "ing_id": "ing_03", "nombre": "Azúcar", "cantidad": 0.30, "unidad": "kg" }
+  ]
+}
+
+5) Colección: productos
+{
+  "_id": "pro_101",
+  "nombre": "Torta de chocolate",
+  "receta": {
+    "rec_id": "rec_10",
+    "nombre": "Bizcochuelo base"
+  },
+  "presentaciones": [
+    { "prp_id": "prp_101a", "tamano": "Individual", "porciones": "1 porción", "factor": 0.5, "precio": 9000 },
+    { "prp_id": "prp_101b", "tamano": "Mediano", "porciones": "8 porciones", "factor": 1.5, "precio": 28000 },
+    { "prp_id": "prp_101c", "tamano": "Grande", "porciones": "12 porciones", "factor": 2.0, "precio": 36000 }
+  ]
+}
+
+6) Colección: pedidos
+{
+  "_id": "ped_5001",
+  "fecha": "2025-01-05",
+  "hora": "15:32:00",
+  "estado": "Pendiente",          // Pendiente | Preparado | Entregado | Anulado
+  "total": 45000,
+  "cliente": { "cli_id": "cli_103", "nombre": "Ana Torres" },
+  "cajero": { "emp_id": "emp_201", "nombre": "Carlos Pérez" },
+  "detalles": [
+    {
+      "prp_id": "prp_101b",
+      "producto": "Torta de chocolate",
+      "tamano": "Mediano",
+      "factor": 1.5,
+      "cantidad": 1,
+      "precio_unitario": 28000,
+      "subtotal": 28000
+    },
+    {
+      "prp_id": "prp_102a",
+      "producto": "Tarta de manzana",
+      "tamano": "Individual",
+      "factor": 0.5,
+      "cantidad": 1,
+      "precio_unitario": 17000,
+      "subtotal": 17000
+    }
+  ],
+  "pagos": [
+    { "metodo": "Efectivo", "fecha": "2025-01-05", "hora": "15:40:00" }
+  ]
+}
+
+7) Colección: compras
+{
+  "_id": "com_9001",
+  "fecha": "2025-01-04T10:00:00",
+  "proveedor": { "prov_id": "prov_01", "nombre": "Insumos Dulce S.A." },
+  "total": 120000,
+  "items": [
+    { "ing_id": "ing_01", "nombre": "Harina de trigo", "cantidad": 20.0, "precio_unit": 2500 },
+    { "ing_id": "ing_03", "nombre": "Azúcar", "cantidad": 10.0, "precio_unit": 3000 }
+  ]
+}
+
+Notas de modelado
+- Se embeben listas en pedidos (detalles y pagos), en productos (presentaciones) y en recetas (ingredientes) para evitar referencias.
+- Los identificadores se mantienen como cadenas legibles (pro_101, ped_5001) para facilitar trazabilidad.
+- Para consultas de stock rápido, los ingredientes siguen en su colección con stock actualizado; los documentos de recetas/pedidos incluyen solo los datos necesarios para cálculo y auditoría. 
